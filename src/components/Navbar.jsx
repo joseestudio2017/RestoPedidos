@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -18,13 +18,23 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import HomeIcon from '@mui/icons-material/Home';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useRole } from '../contexts/RoleContext';
 
 export default function Navbar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { role, logout } = useRole();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/profile');
+  };
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -33,13 +43,30 @@ export default function Navbar() {
     setDrawerOpen(open);
   };
 
-  const navItems = [
-    { name: 'Home', icon: <HomeIcon />, path: '/' },
-    { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
-    { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
-    { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
-    { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
-  ];
+  const allNavItems = {
+    cliente: [
+      { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
+      { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
+      { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+    ],
+    mozo: [
+      { name: 'Home', icon: <HomeIcon />, path: '/' },
+      { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+    ],
+    admin: [
+        { name: 'Home', icon: <HomeIcon />, path: '/' },
+        { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
+        { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
+        { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+        { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+    ],
+    default: [
+      { name: 'Home', icon: <HomeIcon />, path: '/' },
+      { name: 'Profile', icon: <AccountCircleIcon />, path: '/profile' },
+    ]
+  };
+
+  const navItems = role ? allNavItems[role] : allNavItems.default;
 
   const drawerList = () => (
     <Box
@@ -57,6 +84,14 @@ export default function Navbar() {
             </ListItemButton>
           </ListItem>
         ))}
+        {role && (
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemIcon><LogoutIcon /></ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        )}
       </List>
     </Box>
   );
@@ -72,16 +107,23 @@ export default function Navbar() {
         </Typography>
 
         {isMobile ? (
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={toggleDrawer(true)}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+          <>
+            {role && (
+              <IconButton color="inherit" onClick={handleLogout}>
+                <LogoutIcon />
+              </IconButton>
+            )}
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer(true)}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </>
         ) : (
           <Box sx={{ display: 'flex' }}>
             {navItems.map((item) => (
@@ -104,6 +146,24 @@ export default function Navbar() {
                 <Box component="span" sx={{ ml: 0.5 }}>{item.name}</Box>
               </Button>
             ))}
+            {role && (
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                sx={{
+                  mx: 1,
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  '&:hover': {
+                    backgroundColor: theme.palette.secondary.dark,
+                    color: theme.palette.primary.contrastText,
+                  },
+                }}
+              >
+                <LogoutIcon />
+                <Box component="span" sx={{ ml: 0.5 }}>Logout</Box>
+              </Button>
+            )}
           </Box>
         )}
       </Toolbar>

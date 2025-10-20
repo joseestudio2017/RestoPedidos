@@ -13,6 +13,9 @@ import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import AdminAuth from './pages/AdminAuth'; // Importa el nuevo componente
+import Profile from './pages/Profile';
+import Clientes from './pages/Clientes';
+import Mozo from './pages/Mozo';
 
 // Paleta de colores moderna inspirada en McDonald's
 const modernTheme = createTheme({
@@ -81,6 +84,9 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/admin" element={<AdminAuth />} /> {/* Actualiza la ruta de admin */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/clientes" element={<Clientes />} />
+              <Route path="/mozo" element={<Mozo />} />
             </Routes>
           </Box>
         </Box>
