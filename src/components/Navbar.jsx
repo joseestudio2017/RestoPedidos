@@ -1,0 +1,119 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import FastfoodIcon from '@mui/icons-material/Fastfood';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import HomeIcon from '@mui/icons-material/Home';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+export default function Navbar() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawerOpen(open);
+  };
+
+  const navItems = [
+    { name: 'Home', icon: <HomeIcon />, path: '/' },
+    { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
+    { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
+    { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+    { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+  ];
+
+  const drawerList = () => (
+    <Box
+      sx={{ width: 250 }}
+      role="presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}
+    >
+      <List>
+        {navItems.map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton component={Link} to={item.path}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
+  return (
+    <AppBar position="static" sx={{ backgroundColor: theme.palette.primary.main, boxShadow: 'none' }}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+          <Button color="inherit" component={Link} to="/" sx={{ '&:hover': { backgroundColor: 'transparent' } }}>
+            <FastfoodIcon sx={{ mr: 1, color: theme.palette.secondary.main }} />
+            <Box component="span" sx={{ color: theme.palette.secondary.main }}>Resto</Box>Pedidos
+          </Button>
+        </Typography>
+
+        {isMobile ? (
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleDrawer(true)}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        ) : (
+          <Box sx={{ display: 'flex' }}>
+            {navItems.map((item) => (
+              <Button
+                key={item.name}
+                color="inherit"
+                component={Link}
+                to={item.path}
+                sx={{
+                  mx: 1,
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  '&:hover': {
+                    backgroundColor: theme.palette.secondary.dark,
+                    color: theme.palette.primary.contrastText,
+                  },
+                }}
+              >
+                {item.icon}
+                <Box component="span" sx={{ ml: 0.5 }}>{item.name}</Box>
+              </Button>
+            ))}
+          </Box>
+        )}
+      </Toolbar>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+      >
+        {drawerList()}
+      </Drawer>
+    </AppBar>
+  );
+}

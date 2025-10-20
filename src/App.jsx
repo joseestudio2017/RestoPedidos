@@ -1,35 +1,92 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Box,
+} from '@mui/material';
+
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Menu from './pages/Menu';
+import Cart from './pages/Cart';
+import Orders from './pages/Orders';
+import AdminAuth from './pages/AdminAuth'; // Importa el nuevo componente
+
+// Paleta de colores moderna inspirada en McDonald's
+const modernTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#D7231D', // Rojo McDonald's
+    },
+    secondary: {
+      main: '#FFC72C', // Amarillo McDonald's
+    },
+    background: {
+      default: '#F5F5F5', // Un gris muy claro para el fondo
+      paper: '#FFFFFF',   // Blanco para los componentes de "papel"
+    },
+    text: {
+      primary: '#212121', // Negro/gris oscuro para el texto principal
+      secondary: '#757575', // Gris para el texto secundario
+    },
+  },
+  typography: {
+    fontFamily: ['Roboto', 'sans-serif'].join(','),
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 700 },
+    h3: { fontWeight: 600 },
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 600 },
+    button: {
+      textTransform: 'none', // Evita que los botones estén en mayúsculas
+      fontWeight: 'bold',
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+          },
+        },
+      },
+    },
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ThemeProvider theme={modernTheme}>
+      <CssBaseline />
+      <Router>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Navbar />
+          <Box component="main" sx={{ flexGrow: 1 }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/admin" element={<AdminAuth />} /> {/* Actualiza la ruta de admin */}
+            </Routes>
+          </Box>
+        </Box>
+      </Router>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
