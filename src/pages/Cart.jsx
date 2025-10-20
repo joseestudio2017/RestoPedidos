@@ -15,7 +15,6 @@ import {
   CardContent,
   CardMedia,
   Divider,
-  Chip,
 } from '@mui/material';
 import {
   AddCircleOutline as AddIcon,
@@ -23,21 +22,20 @@ import {
   Delete as DeleteIcon,
   ShoppingCart as ShoppingCartIcon
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateItemQuantity, getTotalPrice, clearCart } = useCart();
   const { addOrder } = useOrders();
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [orderType, setOrderType] = useState('take_away');
   const [tableNumber, setTableNumber] = useState('');
   const [takeAwayNumber, setTakeAwayNumber] = useState('');
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(null);
 
   const handlePlaceOrder = () => {
-    const total = getTotalPrice();
+    const total = getTotalPrice() * 1.10; // Incluyendo el IVA
     const newOrder = {
       items: cartItems,
       total: total,
@@ -49,38 +47,15 @@ export default function Cart() {
       timestamp: new Date().toISOString(),
     };
     const orderWithId = addOrder(newOrder);
-    setOrderDetails(orderWithId);
-    setOrderPlaced(true);
-    clearCart();
-  };
+    
+    // Guardar en sessionStorage para persistir tras recarga
+    sessionStorage.setItem('lastOrder', JSON.stringify(orderWithId));
 
-  if (orderPlaced) {
-    return (
-      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Chip label="¡Pedido Realizado con Éxito!" color="success" sx={{ fontSize: '1.2rem', mb: 3 }} />
-          <Typography variant="h4" gutterBottom>
-            ¡Gracias por tu compra!
-          </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-            Tu número de pedido es:
-          </Typography>
-          <Typography variant="h3" fontWeight="bold" color="primary" sx={{ mb: 4 }}>
-            {orderDetails.orderType === 'table' ? `Mesa ${orderDetails.tableNumber}` : `#${orderDetails.takeAwayNumber}`}
-          </Typography>
-          <Button
-            component={Link}
-            to="/menu"
-            variant="contained"
-            color="primary"
-            size="large"
-          >
-            Seguir Comprando
-          </Button>
-        </Paper>
-      </Container>
-    );
-  }
+    clearCart();
+    
+    // Redirigir a la página de facturación
+    navigate('/facturacion', { state: { order: orderWithId } });
+  };
 
   if (cartItems.length === 0) {
     return (

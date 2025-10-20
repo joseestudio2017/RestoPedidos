@@ -12,10 +12,11 @@ import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
-import AdminAuth from './pages/AdminAuth'; // Importa el nuevo componente
+import AdminAuth from './pages/AdminAuth';
 import Profile from './pages/Profile';
 import Clientes from './pages/Clientes';
 import Mozo from './pages/Mozo';
+import Facturacion from './pages/Facturacion'; // Importar la nueva página
 
 // Paleta de colores moderna inspirada en McDonald's
 const modernTheme = createTheme({
@@ -83,10 +84,11 @@ function App() {
               <Route path="/menu" element={<Menu />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/orders" element={<Orders />} />
-              <Route path="/admin" element={<AdminAuth />} /> {/* Actualiza la ruta de admin */}
+              <Route path="/admin" element={<AdminAuth />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/clientes" element={<Clientes />} />
               <Route path="/mozo" element={<Mozo />} />
+              <Route path="/facturacion" element={<Facturacion />} /> {/* Añadir la nueva ruta */}
             </Routes>
           </Box>
         </Box>
