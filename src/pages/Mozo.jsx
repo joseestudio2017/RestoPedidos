@@ -1,43 +1,119 @@
 import React from 'react';
 import { useOrders } from '../contexts/OrdersContext';
+import { Container, Typography, Paper, Grid, Button, Box, Chip, Divider } from '@mui/material';
+import { Fastfood, Restaurant, CheckCircle } from '@mui/icons-material';
 
-function Mozo() {
+const Mozo = () => {
   const { orders, updateOrderStatus } = useOrders();
 
-  const activeOrders = orders.filter(order => order.status === 'en preparacion');
+  const activeOrders = orders.filter(order => order.status !== 'Entregado');
+
+  const handleUpdateStatus = (orderId, newStatus) => {
+    updateOrderStatus(orderId, newStatus);
+  };
+
+  const getOrderStatusChip = (status) => {
+    switch (status) {
+      case 'Pendiente':
+        return <Chip label="Pendiente" color="error" />;
+      case 'En Preparación':
+        return <Chip label="En Preparación" color="warning" />;
+      default:
+        return <Chip label={status} />;
+    }
+  };
+
+  const renderOrderHeader = (order) => {
+    if (order.orderType === 'takeaway') {
+      return (
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Fastfood color="primary" />
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Pedido para Llevar
+            </Typography>
+          </Box>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Cliente: {order.customerName} ({order.takeAwayNumber})
+          </Typography>
+        </Box>
+      );
+    }
+    if (order.orderType === 'table') {
+      return (
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Restaurant color="primary" />
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Comer en el Lugar
+            </Typography>
+          </Box>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Mesa seleccionada: {order.tableNumber}
+          </Typography>
+        </Box>
+      );
+    }
+    return null;
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Pedidos Activos</h1>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 6, fontWeight: 800 }}>
+        Panel de Pedidos
+      </Typography>
       {activeOrders.length > 0 ? (
-        <ul className="space-y-4">
-          {activeOrders.map(order => (
-            <li key={order.id} className="p-4 border rounded-md shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold">Pedido #{order.id}</h2>
-                  <ul>
-                    {order.items.map(item => (
-                      <li key={item.id}>{item.name} - {item.quantity}</li>
-                    ))}
-                  </ul>
-                  <p className="text-gray-500">Total: ${order.total.toFixed(2)}</p>
-                </div>
-                <button 
-                  onClick={() => updateOrderStatus(order.id, 'entregado')}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-                >
-                  Marcar como Entregado
-                </button>
-              </div>
-            </li>
+        <Grid container spacing={3}>
+          {activeOrders.map((order) => (
+            <Grid item xs={12} sm={6} md={4} key={order.id}>
+              <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2 }}>
+                {renderOrderHeader(order)}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
+                  {getOrderStatusChip(order.status)}
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ flexGrow: 1, my: 2, maxHeight: 150, overflowY: 'auto' }}>
+                  {order.items.map((item) => (
+                    <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography>{item.name}</Typography>
+                      <Typography>x{item.quantity}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ mt: 'auto' }}>
+                  {order.status === 'Pendiente' && (
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      fullWidth
+                      onClick={() => handleUpdateStatus(order.id, 'En Preparación')}
+                    >
+                      Marcar como En Preparación
+                    </Button>
+                  )}
+                  {order.status === 'En Preparación' && (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      fullWidth
+                      onClick={() => handleUpdateStatus(order.id, 'Entregado')}
+                      startIcon={<CheckCircle />}
+                    >
+                      Entregar
+                    </Button>
+                  )}
+                </Box>
+              </Paper>
+            </Grid>
           ))}
-        </ul>
+        </Grid>
       ) : (
-        <p>No hay pedidos activos en este momento.</p>
+        <Typography variant="h5" align="center" color="text.secondary">No hay pedidos activos en este momento.</Typography>
       )}
-    </div>
+    </Container>
   );
-}
+};
 
 export default Mozo;
