@@ -6,18 +6,16 @@ export const OrdersProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
 
   const addOrder = (newOrder) => {
-    // 1. Crear el nuevo objeto de pedido con un ID único y un estado inicial.
-    const orderWithId = { 
-      ...newOrder, 
-      id: `order${Date.now()}`,
-      status: 'Pendiente' // ¡Añadido estado inicial!
+    // ¡CAMBIO IMPORTANTE! El estado inicial ahora es "en preparacion"
+    const orderWithDetails = {
+      ...newOrder,
+      id: `order_${Date.now()}`,
+      timestamp: new Date(),
+      status: 'en preparacion', // Directo a la cocina
     };
-    
-    // 2. Actualizar el estado de los pedidos.
-    setOrders((prevOrders) => [...prevOrders, orderWithId]);
-    
-    // 3. Devolver el nuevo pedido con su ID.
-    return orderWithId;
+
+    setOrders((prevOrders) => [...prevOrders, orderWithDetails]);
+    return orderWithDetails;
   };
 
   const updateOrderStatus = (orderId, newStatus) => {

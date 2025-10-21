@@ -46,19 +46,20 @@ export default function Navbar() {
   const allNavItems = {
     cliente: [
       { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
-      { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
-      { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+      { name: 'Carrito', icon: <ShoppingCartIcon />, path: '/carrito' },
+      { name: 'Mis Pedidos', icon: <ListAltIcon />, path: '/orders' },
     ],
     mozo: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
-      { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+      { name: 'Pedidos para Entregar', icon: <FastfoodIcon />, path: '/mozo' },
     ],
     admin: [
         { name: 'Home', icon: <HomeIcon />, path: '/' },
         { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
-        { name: 'Cart', icon: <ShoppingCartIcon />, path: '/cart' },
-        { name: 'Orders', icon: <ListAltIcon />, path: '/orders' },
+        { name: 'Carrito', icon: <ShoppingCartIcon />, path: '/carrito' },
+        { name: 'Mis Pedidos', icon: <ListAltIcon />, path: '/orders' },
         { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+        { name: 'Mozo', icon: <FastfoodIcon />, path: '/mozo' },
     ],
     default: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
@@ -66,7 +67,7 @@ export default function Navbar() {
     ]
   };
 
-  const navItems = role ? allNavItems[role] : allNavItems.default;
+  const navItems = role ? allNavItems[role] || allNavItems.default : allNavItems.default;
 
   const drawerList = () => (
     <Box
@@ -108,64 +109,46 @@ export default function Navbar() {
 
         {isMobile ? (
           <>
-            {role && (
-              <IconButton color="inherit" onClick={handleLogout}>
-                <LogoutIcon />
-              </IconButton>
-            )}
             <IconButton
               size="large"
               edge="start"
               color="inherit"
               aria-label="menu"
               onClick={toggleDrawer(true)}
-              sx={{ mr: 2 }}
             >
               <MenuIcon />
             </IconButton>
           </>
         ) : (
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {navItems.map((item) => (
               <Button
                 key={item.name}
                 color="inherit"
                 component={Link}
                 to={item.path}
+                startIcon={item.icon}
                 sx={{
                   mx: 1,
                   fontWeight: 'bold',
                   fontSize: '1rem',
+                  color: 'white',
                   '&:hover': {
-                    backgroundColor: theme.palette.secondary.dark,
-                    color: theme.palette.primary.contrastText,
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   },
                 }}
               >
-                {item.icon}
-                <Box component="span" sx={{ ml: 0.5 }}>{item.name}</Box>
+                {item.name}
               </Button>
             ))}
-            {role && (
-              <Button
-                color="inherit"
-                onClick={handleLogout}
-                sx={{
-                  mx: 1,
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  '&:hover': {
-                    backgroundColor: theme.palette.secondary.dark,
-                    color: theme.palette.primary.contrastText,
-                  },
-                }}
-              >
-                <LogoutIcon />
-                <Box component="span" sx={{ ml: 0.5 }}>Logout</Box>
-              </Button>
-            )}
           </Box>
         )}
+         {role && (
+              <Button color="inherit" onClick={handleLogout} sx={{ color: 'white' }}>
+                <LogoutIcon sx={{ mr: 1 }}/>
+                Logout
+              </Button>
+            )}
       </Toolbar>
       <Drawer
         anchor="right"

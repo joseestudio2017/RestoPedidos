@@ -7,8 +7,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
-  Button,
   Chip,
   Divider,
   List,
@@ -17,52 +15,60 @@ import {
 } from '@mui/material';
 import { Fastfood, Done, Restaurant } from '@mui/icons-material';
 
+// Componente para mostrar un chip de estado visualmente distintivo
 const getStatusChip = (status) => {
   switch (status) {
-    case 'Pending':
-      return <Chip icon={<Restaurant />} label="Pending" color="warning" />;
-    case 'In Preparation':
-      return <Chip icon={<Fastfood />} label="In Preparation" color="info" />;
-    case 'Delivered':
-      return <Chip icon={<Done />} label="Delivered" color="success" />;
+    case 'pendiente':
+      // El estado "Pendiente" es ahora más sutil (contorno)
+      return <Chip icon={<Restaurant />} label="Pendiente" color="info" variant="outlined" />;
+    case 'en preparacion':
+      // ¡NUEVO! "En Preparación" ahora es el estado destacado con el color naranja/warning.
+      return <Chip icon={<Fastfood />} label="En Preparación" color="warning" variant="contained" />;
+    case 'entregado':
+      return <Chip icon={<Done />} label="Entregado" color="success" variant="outlined" />;
     default:
-      return <Chip label="Unknown" />;
+      // Un estado por defecto claro para la depuración
+      return <Chip label={status ? `Desconocido: ${status}` : 'Sin Estado'} />;
   }
 };
 
+// Vista de "Mis Pedidos" para el CLIENTE
 const Orders = () => {
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders } = useOrders();
+
+  // Muestra los pedidos más recientes primero
+  const customerOrders = orders.slice().sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 6, fontWeight: 800 }}>
-        Pedidos Activos
+        Mis Pedidos
       </Typography>
 
-      {orders.length === 0 ? (
+      {customerOrders.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Restaurant sx={{ fontSize: 80, color: 'text.secondary' }} />
           <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
-            No hay pedidos activos
+            Aún no tienes pedidos
           </Typography>
           <Typography variant="h6" color="text.secondary">
-            Cuando los clientes hagan un pedido, aparecerá aquí.
+            Cuando hagas un pedido, podrás ver su estado aquí.
           </Typography>
         </Box>
       ) : (
         <Grid container spacing={4}>
-          {orders.map((order) => (
+          {customerOrders.map((order) => (
             <Grid item key={order.id} xs={12} sm={6} md={4}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Typography variant="h5" component="div" fontWeight="bold">
-                      {order.orderType === 'table' ? `Mesa ${order.tableNumber}` : `Pedido #${order.takeAwayNumber}`}
+                      Pedido #{order.id.slice(-6).toUpperCase()}
                     </Typography>
                     {getStatusChip(order.status)}
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {new Date(order.timestamp).toLocaleTimeString()}
+                    {new Date(order.timestamp).toLocaleString()}
                   </Typography>
 
                   <Divider sx={{ my: 1 }} />
@@ -86,18 +92,6 @@ const Orders = () => {
                   </Box>
 
                 </CardContent>
-                <CardActions sx={{ p: 2, justifyContent: 'space-around' }}>
-                  {order.status === 'Pending' && (
-                    <Button variant="contained" color="info" onClick={() => updateOrderStatus(order.id, 'In Preparation')}>
-                      Preparar
-                    </Button>
-                  )}
-                  {order.status === 'In Preparation' && (
-                    <Button variant="contained" color="success" onClick={() => updateOrderStatus(order.id, 'Delivered')}>
-                      Entregar
-                    </Button>
-                  )}
-                </CardActions>
               </Card>
             </Grid>
           ))}
