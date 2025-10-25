@@ -6,6 +6,7 @@ import {
   Box,
   Grid,
   Card,
+  CardMedia, // Importado
   CardContent,
   Chip,
   Divider,
@@ -17,9 +18,9 @@ import {
 } from '@mui/material';
 import {
   Fastfood,
-  DoneAll, // Icono más claro para "Entregado"
-  HourglassTop, // Icono para "Pendiente"
-  RestaurantMenu, // Icono principal de la página
+  DoneAll,
+  HourglassTop,
+  RestaurantMenu,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
@@ -95,6 +96,16 @@ const Orders = () => {
                   boxShadow: theme.shadows[8],
                 }
               }}>
+                {/* ===== IMAGEN AÑADIDA ===== */}
+                {order.items && order.items.length > 0 && (
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={order.items[0].image}
+                    alt={`Imagen de ${order.items[0].name}`}
+                  />
+                )}
+                 {/* ===== FIN DE IMAGEN AÑADIDA ===== */}
                 <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3} }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Typography variant="h6" component="div" fontWeight="bold">
