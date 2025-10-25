@@ -16,19 +16,21 @@ const Home = () => {
   return (
     <Box
       sx={{
-        height: 'calc(100vh - 64px)', // Asume que el AppBar tiene 64px de altura
+        height: 'calc(100vh - 64px)', // Altura estricta para viewport
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'column', // Apilar contenido verticalmente
+        alignItems: 'center',   // Centrar horizontalmente
+        justifyContent: 'center', // Centrar verticalmente
         position: 'relative',
-        // La imagen de fondo se define aquí
         backgroundImage: 'url(https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
-        backgroundSize: 'cover', // Asegura que la imagen cubra todo el espacio
-        backgroundPosition: 'center', // Centra la imagen
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         color: 'white',
         textAlign: 'center',
+        // Padding solo horizontal para evitar desbordamiento vertical
+        px: 2,
 
-        // Superposición para oscurecer la imagen y mejorar la legibilidad del texto
+        // Overlay oscuro para legibilidad
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -36,11 +38,10 @@ const Home = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semitransparente
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
         },
 
-        // Asegura que el contenido (texto, botón) esté por encima de la superposición
-        // Usamos '> *' para aplicar esto a todos los hijos directos del Box
+        // Contenido por encima del overlay
         '> *': {
           position: 'relative',
           zIndex: 1,
@@ -49,26 +50,27 @@ const Home = () => {
     >
       <Container maxWidth="md">
         <Typography
-          variant={isMobile ? 'h2' : 'h1'}
+          variant={isMobile ? 'h4' : 'h1'} // Reducido a h4 en móvil
           component="h1"
           sx={{
-            fontWeight: '900',
+            fontWeight: '800',
             textTransform: 'uppercase',
-            letterSpacing: '2px',
-            textShadow: '3px 3px 8px rgba(0,0,0,0.7)', // Sombra para el texto
+            letterSpacing: '1px',
+            textShadow: '2px 2px 6px rgba(0,0,0,0.8)',
           }}
         >
           RestoPedidos
         </Typography>
         <Typography
-          variant={isMobile ? 'h6' : 'h5'}
+          variant={isMobile ? 'body1' : 'h5'}
           component="p"
           sx={{
-            mt: 2,
-            mb: 4,
-            maxWidth: '600px',
+            mt: 1,      // Margen superior mínimo
+            mb: 2,      // Margen inferior mínimo
+            maxWidth: '500px',
             mx: 'auto',
-            textShadow: '2px 2px 6px rgba(0,0,0,0.7)',
+            textShadow: '1px 1px 4px rgba(0,0,0,0.7)',
+            fontWeight: 400,
           }}
         >
           La forma más rápida y deliciosa de pedir tu comida favorita.
@@ -78,12 +80,12 @@ const Home = () => {
           to="/menu"
           variant="contained"
           color="secondary"
-          size={isMobile ? 'medium' : 'large'}
+          size="large" // Botón grande para fácil toque
           sx={{
-            fontSize: isMobile ? '1rem' : '1.2rem',
-            py: 1.5,
-            px: 4,
-            boxShadow: '0 4px 15px rgba(0,0,0,0.4)', // Sombra para el botón
+            fontSize: { xs: '1rem', sm: '1.2rem' },
+            py: { xs: 1.2, sm: 1.5 },
+            px: { xs: 4, sm: 5 },
+            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
           }}
         >
           Ver Menú

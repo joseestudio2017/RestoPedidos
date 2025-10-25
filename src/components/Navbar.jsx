@@ -14,7 +14,8 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import FastfoodIcon from '@mui/icons-material/Fastfood';
@@ -24,10 +25,12 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle'; // Importado
 import { useRole } from '../contexts/RoleContext';
 
 export default function Navbar() {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { role, logout } = useRole();
   const navigate = useNavigate();
@@ -57,6 +60,7 @@ export default function Navbar() {
     admin: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
       { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+      { name: 'TP', icon: <BuildCircleIcon />, path: '/tp' }, // Añadido
     ],
     default: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
@@ -68,38 +72,37 @@ export default function Navbar() {
 
   const drawerList = () => (
     <Box
-      sx={{ width: 250 }}
+      sx={{ width: 270, display: 'flex', flexDirection: 'column', height: '100%' }}
       role="presentation"
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
-        <Toolbar>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Navegación</Typography>
-        </Toolbar>
-        <Divider />
-        <List>
-            {navItems.map((item) => (
-            <ListItem key={item.name} disablePadding>
-                <ListItemButton component={Link} to={item.path}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} />
-                </ListItemButton>
+      <Box sx={{ p: 2, textAlign: 'center', backgroundColor: 'primary.main', color: 'white' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>RestoPedidos</Typography>
+      </Box>
+      <List sx={{ flexGrow: 1 }}>
+        {navItems.map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton component={Link} to={item.path}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      {role && (
+        <>
+          <Divider />
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
+                <ListItemText primary="Cerrar Sesión" />
+              </ListItemButton>
             </ListItem>
-            ))}
-        </List>
-        {role && (
-            <>
-                <Divider />
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={handleLogout}>
-                        <ListItemIcon><LogoutIcon /></ListItemIcon>
-                        <ListItemText primary="Cerrar Sesión" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-            </>
-        )}
+          </List>
+        </>
+      )}
     </Box>
   );
 
@@ -140,38 +143,37 @@ export default function Navbar() {
           <Box component="span" sx={{ color: 'secondary.main' }}>Resto</Box>Pedidos
         </Button>
 
-        {/* Mobile Menu Icon */}
-        <IconButton
+        {isMobile ? (
+          <IconButton
             size="large"
             edge="end"
             color="inherit"
             aria-label="menu"
             onClick={toggleDrawer(true)}
-            sx={{ display: { md: 'none' } }}
-        >
+          >
             <MenuIcon />
-        </IconButton>
-        
-        {/* Desktop Menu */}
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-          {navItems.map((item) => (
-            <Button
-              key={item.name}
-              color="inherit"
-              component={Link}
-              to={item.path}
-              startIcon={item.icon}
-              sx={navButtonSx}
-            >
-              {item.name}
-            </Button>
-          ))}
-          {role && (
-            <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />} sx={navButtonSx}>
-              Cerrar Sesión
-            </Button>
-          )}
-        </Box>
+          </IconButton>
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {navItems.map((item) => (
+              <Button
+                key={item.name}
+                color="inherit"
+                component={Link}
+                to={item.path}
+                startIcon={item.icon}
+                sx={navButtonSx}
+              >
+                {item.name}
+              </Button>
+            ))}
+            {role && (
+              <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />} sx={navButtonSx}>
+                Cerrar Sesión
+              </Button>
+            )}
+          </Box>
+        )}
       </Toolbar>
       <Drawer
         anchor="right"

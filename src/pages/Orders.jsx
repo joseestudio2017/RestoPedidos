@@ -6,7 +6,7 @@ import {
   Box,
   Grid,
   Card,
-  CardMedia, // Importado
+  CardMedia,
   CardContent,
   Chip,
   Divider,
@@ -14,7 +14,8 @@ import {
   ListItem,
   ListItemText,
   useTheme,
-  Button
+  Button,
+  useMediaQuery
 } from '@mui/material';
 import {
   Fastfood,
@@ -59,6 +60,7 @@ const getStatusChip = (status) => {
 const Orders = () => {
   const { orders } = useOrders();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const customerOrders = orders.slice().sort((a, b) => b.timestamp - a.timestamp);
 
@@ -82,7 +84,7 @@ const Orders = () => {
           </Button>
         </Box>
       ) : (
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        <Grid container spacing={{ xs: 3, sm: 3, md: 4 }}>
           {customerOrders.map((order) => (
             <Grid item key={order.id} xs={12} md={6} lg={4}>
               <Card sx={{ 
@@ -96,19 +98,17 @@ const Orders = () => {
                   boxShadow: theme.shadows[8],
                 }
               }}>
-                {/* ===== IMAGEN AÑADIDA ===== */}
                 {order.items && order.items.length > 0 && (
                   <CardMedia
                     component="img"
-                    height="180"
+                    height={isMobile ? "160" : "180"}
                     image={order.items[0].image}
                     alt={`Imagen de ${order.items[0].name}`}
                   />
                 )}
-                 {/* ===== FIN DE IMAGEN AÑADIDA ===== */}
                 <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3} }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                    <Typography variant="h6" component="div" fontWeight="bold">
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexDirection: isMobile ? 'column' : 'row' }}>
+                    <Typography variant={isMobile ? 'h6' : 'h5'} component="div" fontWeight="bold" sx={{ mb: isMobile ? 1.5 : 0 }}>
                       Pedido #{order.id.slice(-6).toUpperCase()}
                     </Typography>
                     {getStatusChip(order.status)}
@@ -120,14 +120,15 @@ const Orders = () => {
                   <Divider sx={{ my: 2 }} />
 
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Detalles:</Typography>
-                  <Box sx={{ maxHeight: 150, overflow: 'auto', mb: 2 }}>
+                  <Box sx={{ maxHeight: isMobile ? 120 : 150, overflow: 'auto', mb: 2 }}>
                     <List dense>
                       {order.items.map(item => (
                         <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
                           <ListItemText 
                             primary={`${item.name} (x${item.quantity})`}
                             secondary={`$${(item.price * item.quantity).toFixed(2)}`}
-                            primaryTypographyProps={{ fontWeight: 500 }}
+                            primaryTypographyProps={{ fontWeight: 500, fontSize: isMobile ? '0.9rem' : '1rem' }}
+                            secondaryTypographyProps={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
                           />
                         </ListItem>
                       ))}
@@ -138,7 +139,7 @@ const Orders = () => {
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                     <Typography variant="h6" fontWeight="bold">Total:</Typography>
-                    <Typography variant="h5" fontWeight="bold" color="primary.main">${order.total.toFixed(2)}</Typography>
+                    <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight="bold" color="primary.main">${order.total.toFixed(2)}</Typography>
                   </Box>
 
                 </CardContent>

@@ -39,10 +39,10 @@ const Menu = () => {
       const cartItem = cartItems.find(ci => ci.id === item.id);
 
       return (
-        <Card sx={{ 
-          height: '100%', 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <Card sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
           boxShadow: theme.shadows[6],
           borderRadius: '12px',
           transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
@@ -53,34 +53,34 @@ const Menu = () => {
         }}>
           <CardMedia
             component="img"
-            height="220"
+            height={isMobile ? "180" : "220"} // Altura de imagen reducida en móvil
             image={item.image}
             alt={item.name}
           />
           <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-            <Typography gutterBottom variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+            <Typography gutterBottom variant={isMobile ? 'h6' : 'h5'} component="h2" sx={{ fontWeight: 'bold' }}>
               {item.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ minHeight: '4.5em' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {item.description}
             </Typography>
-            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-              <Chip 
+            <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center' }}>
+              <Chip
                 label={`$${item.price.toFixed(2)}`}
                 color="primary"
-                sx={{ fontSize: '1.1rem', fontWeight: 'bold', py: 2, px: 1 }}
+                sx={{ fontSize: isMobile ? '1rem' : '1.1rem', fontWeight: 'bold', py: isMobile ? 1.5 : 2, px: 1 }}
               />
             </Box>
           </CardContent>
-          <CardActions sx={{ justifyContent: 'center', p: 2 }}>
+          <CardActions sx={{ justifyContent: 'center', p: { xs: 1, sm: 2 }, pt: 0 }}>
             {role ? (
               cartItem ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '90%' }}>
-                  <IconButton color="secondary" onClick={() => decreaseFromCart(item.id)}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%' }}>
+                  <IconButton color="secondary" onClick={() => decreaseFromCart(item.id)} sx={{ p: 1.5 }}>
                     <RemoveIcon />
                   </IconButton>
-                  <Typography variant="h6" sx={{ mx: 2 }}>{cartItem.quantity}</Typography>
-                  <IconButton color="secondary" onClick={() => addToCart(item)}>
+                  <Typography variant="h6" sx={{ mx: 1 }}>{cartItem.quantity}</Typography>
+                  <IconButton color="secondary" onClick={() => addToCart(item)} sx={{ p: 1.5 }}>
                     <AddIcon />
                   </IconButton>
                 </Box>
@@ -89,7 +89,7 @@ const Menu = () => {
                   variant="contained"
                   color="secondary"
                   onClick={() => addToCart(item)}
-                  sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+                  sx={{ width: '95%', py: 1.2, fontSize: '0.9rem' }}
                 >
                   Añadir al Carrito
                 </Button>
@@ -99,9 +99,9 @@ const Menu = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleLoginRedirect}
-                sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+                sx={{ width: '95%', py: 1.2, fontSize: '0.9rem' }}
               >
-                Ingresar como Cliente
+                Ingresar para Pedir
               </Button>
             )}
           </CardActions>
@@ -114,18 +114,17 @@ const Menu = () => {
         <Box sx={{
           display: 'flex',
           overflowX: 'auto',
-          gap: '5vw',
-          p: '0 2.5vw',
-          pb: 2,
+          gap: '4vw',
+          p: '0 2vw 16px 2vw',
           scrollSnapType: 'x mandatory',
           '&::-webkit-scrollbar': { display: 'none' },
           '-ms-overflow-style': 'none',
           'scrollbar-width': 'none',
         }}>
           {items.map((item) => (
-            <Box key={item.id} sx={{ 
-              width: '90vw',
-              maxWidth: '400px',
+            <Box key={item.id} sx={{
+              width: '85vw',
+              maxWidth: '380px',
               flexShrink: 0,
               scrollSnapAlign: 'center',
             }}>
@@ -174,11 +173,11 @@ const Menu = () => {
       }}
     >
       <Container maxWidth="xl">
-        <Typography 
-          variant={isMobile ? 'h3' : 'h2'} 
-          component="h1" 
-          gutterBottom 
-          align="center" 
+        <Typography
+          variant={isMobile ? 'h3' : 'h2'}
+          component="h1"
+          gutterBottom
+          align="center"
           sx={{ mb: { xs: 4, md: 6 }, fontWeight: 800, color: '#2C3E50' }}
         >
           Nuestro Menú
@@ -191,15 +190,15 @@ const Menu = () => {
         ) : (
           menu.map((category) => (
             <Box key={category.id} sx={{ mb: { xs: 5, md: 8 } }}>
-              <Typography 
-                variant={isMobile ? 'h4' : 'h3'} 
-                component="h2" 
-                gutterBottom 
-                sx={{ 
-                  borderBottom: 3, 
-                  borderColor: 'secondary.main', 
-                  pb: 1, 
-                  mb: { xs: 3, md: 5 }, 
+              <Typography
+                variant={isMobile ? 'h4' : 'h3'}
+                component="h2"
+                gutterBottom
+                sx={{
+                  borderBottom: 3,
+                  borderColor: 'secondary.main',
+                  pb: 1,
+                  mb: { xs: 3, md: 5 },
                   color: '#34495E',
                   display: 'inline-block',
                 }}

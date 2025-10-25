@@ -4,8 +4,8 @@ import { useOrders } from '../contexts/OrdersContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Box, Grid, Card, CardContent, CardMedia,
-  Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton, 
-  Modal, FormHelperText, useTheme 
+  Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton,
+  Modal, FormHelperText, useTheme, useMediaQuery
 } from '@mui/material';
 import {
   AddCircleOutline, RemoveCircleOutline, DeleteOutline
@@ -17,6 +17,7 @@ const Carrito = () => {
   const { addOrder } = useOrders();
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [orderType, setOrderType] = useState('table');
   const [customerName, setCustomerName] = useState('');
@@ -28,7 +29,7 @@ const Carrito = () => {
   const handleOrderTypeChange = (event, newOrderType) => {
     if (newOrderType !== null) {
       setOrderType(newOrderType);
-      setError(''); 
+      setError('');
     }
   };
 
@@ -62,11 +63,85 @@ const Carrito = () => {
     clearCart();
     navigate('/facturacion', { state: { order: newOrder } });
   };
-  
+
   const handleSelectTable = (tableId, chairs) => {
     setTable(tableId, chairs);
     setIsModalOpen(false);
   };
+
+  const renderOrderOptions = () => (
+    <Box>
+      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Opciones del Pedido</Typography>
+      <ToggleButtonGroup
+        value={orderType}
+        exclusive
+        onChange={handleOrderTypeChange}
+        fullWidth
+        sx={{ mb: 3 }}
+      >
+        <ToggleButton value="table">Para Mesa</ToggleButton>
+        <ToggleButton value="takeaway">Para Llevar</ToggleButton>
+      </ToggleButtonGroup>
+
+      {orderType === 'table' ? (
+         <Box>
+            {selectedTable ? (
+              <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>
+                Mesa: <strong>{selectedTable}</strong> | Sillas: <strong>{numberOfChairs}</strong>
+              </Typography>
+            ) : (
+              <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>Mesa: <strong>Ninguna</strong></Typography>
+            )}
+            <Button variant="outlined" onClick={() => setIsModalOpen(true)} fullWidth>
+              {selectedTable ? 'Cambiar Mesa' : 'Seleccionar Mesa'}
+            </Button>
+         </Box>
+      ) : (
+        <TextField
+          label="Nombre y Apellido"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          fullWidth
+          variant="outlined"
+          error={!!error && orderType === 'takeaway'}
+        />
+      )}
+      {error && <FormHelperText error sx={{ mt: 1, fontWeight: 'bold' }}>{error}</FormHelperText>}
+    </Box>
+  );
+
+  const renderCartItems = () => (
+    <Box sx={isMobile ? { pb: '180px' } : {}}>
+      {cartItems.map((item) => (
+        <Card key={item.id} sx={{ display: 'flex', mb: 2.5, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, boxShadow: theme.shadows[2] }}>
+          <CardMedia
+            component="img"
+            sx={{ width: { xs: '100%', sm: 140 }, height: { xs: 160, sm: 140 }, objectFit: 'cover' }}
+            image={item.image || 'https://via.placeholder.com/150'}
+            alt={item.name}
+          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
+            <CardContent sx={{ flex: '1 0 auto', p: { xs: 2, sm: '16px 24px' } }}>
+              <Typography component="div" variant="h6" sx={{ fontWeight: 'bold' }}>{item.name}</Typography>
+              <Typography variant="subtitle1" color="text.secondary" component="div">${item.price.toFixed(2)}</Typography>
+            </CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', pl: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
+              <IconButton onClick={() => updateItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} size="small">
+                <RemoveCircleOutline />
+              </IconButton>
+              <Typography sx={{ mx: 2, fontWeight: 'bold', width: 20, textAlign: 'center' }}>{item.quantity}</Typography>
+              <IconButton onClick={() => updateItemQuantity(item.id, item.quantity + 1)} size="small">
+                <AddCircleOutline />
+              </IconButton>
+              <IconButton onClick={() => removeFromCart(item.id)} sx={{ ml: 'auto', mr: 2 }}>
+                <DeleteOutline color="error" />
+              </IconButton>
+            </Box>
+          </Box>
+        </Card>
+      ))}
+    </Box>
+  );
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
@@ -78,77 +153,39 @@ const Carrito = () => {
           <Typography variant="h5" color="text.secondary">Tu carrito está vacío.</Typography>
           <Button component="a" href="/menu" variant="contained" color="primary" sx={{ mt: 3 }}>Ir al Menú</Button>
         </Box>
+      ) : isMobile ? (
+        // =========== MOBILE LAYOUT ===========
+        <>
+          <Paper elevation={3} sx={{ p: 2, mb: 3, borderRadius: '12px' }}>
+            {renderOrderOptions()}
+          </Paper>
+          {renderCartItems()}
+          <Paper elevation={8} sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, p: 2, zIndex: 1100 }}>
+             <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 1 }}>
+                <Typography variant="h6">Subtotal:</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${subtotal.toFixed(2)}</Typography>
+              </Box>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                size="large"
+                sx={{ mt: 1, py: 1.5, fontWeight: 'bold' }}
+                onClick={handleConfirmOrder}
+              >
+                Confirmar y Pagar
+              </Button>
+          </Paper>
+        </>
       ) : (
+        // =========== DESKTOP LAYOUT ===========
         <Grid container spacing={{ xs: 3, md: 4 }}>
           <Grid item xs={12} md={8}>
-            {cartItems.map((item) => (
-              <Card key={item.id} sx={{ display: 'flex', mb: 2.5, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, boxShadow: theme.shadows[2] }}>
-                <CardMedia
-                  component="img"
-                  sx={{ width: { xs: '100%', sm: 140 }, height: { xs: 160, sm: 140 }, objectFit: 'cover' }}
-                  image={item.image || 'https://via.placeholder.com/150'}
-                  alt={item.name}
-                />
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
-                  <CardContent sx={{ flex: '1 0 auto', p: { xs: 2, sm: '16px 24px' } }}>
-                    <Typography component="div" variant="h6" sx={{ fontWeight: 'bold' }}>{item.name}</Typography>
-                    <Typography variant="subtitle1" color="text.secondary" component="div">${item.price.toFixed(2)}</Typography>
-                  </CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', pl: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
-                    <IconButton onClick={() => updateItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} size="small">
-                      <RemoveCircleOutline />
-                    </IconButton>
-                    <Typography sx={{ mx: 2, fontWeight: 'bold', width: 20, textAlign: 'center' }}>{item.quantity}</Typography>
-                    <IconButton onClick={() => updateItemQuantity(item.id, item.quantity + 1)} size="small">
-                      <AddCircleOutline />
-                    </IconButton>
-                    <IconButton onClick={() => removeFromCart(item.id)} sx={{ ml: 'auto', mr: 2 }}>
-                      <DeleteOutline color="error" />
-                    </IconButton>
-                  </Box>
-                </Box>
-              </Card>
-            ))}
+            {renderCartItems()}
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, position: { md: 'sticky' }, top: 80, borderRadius: '12px' }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Opciones del Pedido</Typography>
-              <ToggleButtonGroup
-                value={orderType}
-                exclusive
-                onChange={handleOrderTypeChange}
-                fullWidth
-                sx={{ mb: 3 }}
-              >
-                <ToggleButton value="table">Para Mesa</ToggleButton>
-                <ToggleButton value="takeaway">Para Llevar</ToggleButton>
-              </ToggleButtonGroup>
-
-              {orderType === 'table' ? (
-                 <Box>
-                    {selectedTable ? (
-                      <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>
-                        Mesa: <strong>{selectedTable}</strong> | Sillas: <strong>{numberOfChairs}</strong>
-                      </Typography>
-                    ) : (
-                      <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>Mesa: <strong>Ninguna</strong></Typography>
-                    )}
-                    <Button variant="outlined" onClick={() => setIsModalOpen(true)} fullWidth>
-                      {selectedTable ? 'Cambiar Mesa' : 'Seleccionar Mesa'}
-                    </Button>
-                 </Box>
-              ) : (
-                <TextField
-                  label="Nombre y Apellido"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  fullWidth
-                  variant="outlined"
-                  error={!!error && orderType === 'takeaway'}
-                />
-              )}
-              {error && <FormHelperText error sx={{ mt: 1, fontWeight: 'bold' }}>{error}</FormHelperText>}
-
+            <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, position: 'sticky', top: 80, borderRadius: '12px' }}>
+              {renderOrderOptions()}
               <Divider sx={{ my: 3 }}/>
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Resumen</Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 1.5 }}>

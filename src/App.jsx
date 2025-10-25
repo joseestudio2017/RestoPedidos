@@ -9,34 +9,34 @@ import {
 } from '@mui/material';
 
 import Navbar from './components/Navbar';
+import AdminRoute from './components/AdminRoute'; // Importado
+
 import Home from './pages/Home';
 import Menu from './pages/Menu';
-import Carrito from './pages/Carrito'; // Cambiado
+import Carrito from './pages/Carrito';
 import Orders from './pages/Orders';
 import AdminAuth from './pages/AdminAuth';
 import Profile from './pages/Profile';
 import Clientes from './pages/Clientes';
 import Mozo from './pages/Mozo';
 import Facturacion from './pages/Facturacion';
+import TP from './pages/TP'; // Importado
 
-// NOTA: El OrdersProvider se gestiona en main.jsx, no aquí.
-
-// Paleta de colores moderna inspirada en McDonald's
 const modernTheme = createTheme({
   palette: {
     primary: {
-      main: '#D7231D', // Rojo McDonald's
+      main: '#D7231D',
     },
     secondary: {
-      main: '#FFC72C', // Amarillo McDonald's
+      main: '#FFC72C',
     },
     background: {
-      default: '#F5F5F5', // Un gris muy claro para el fondo
-      paper: '#FFFFFF',   // Blanco para los componentes de "papel"
+      default: '#F5F5F5',
+      paper: '#FFFFFF',
     },
     text: {
-      primary: '#212121', // Negro/gris oscuro para el texto principal
-      secondary: '#757575', // Gris para el texto secundario
+      primary: '#212121',
+      secondary: '#757575',
     },
   },
   typography: {
@@ -47,7 +47,7 @@ const modernTheme = createTheme({
     h4: { fontWeight: 600 },
     h5: { fontWeight: 600 },
     button: {
-      textTransform: 'none', // Evita que los botones estén en mayúsculas
+      textTransform: 'none',
       fontWeight: 'bold',
     },
   },
@@ -83,15 +83,19 @@ function App() {
           <Navbar />
           <Container component="main" maxWidth={false} disableGutters sx={{ flexGrow: 1 }}>
             <Routes>
+              {/* Rutas Públicas */}
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} />
-              <Route path="/carrito" element={<Carrito />} /> {/* Cambiado */}
+              <Route path="/carrito" element={<Carrito />} />
               <Route path="/orders" element={<Orders />} />
-              <Route path="/admin" element={<AdminAuth />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/clientes" element={<Clientes />} />
-              <Route path="/mozo" element={<Mozo />} />
-              <Route path="/facturacion" element={<Facturacion />} />
+
+              {/* Rutas de Admin */}
+              <Route path="/admin" element={<AdminAuth />} />
+              <Route path="/clientes" element={<AdminRoute><Clientes /></AdminRoute>} />
+              <Route path="/mozo" element={<AdminRoute><Mozo /></AdminRoute>} />
+              <Route path="/facturacion" element={<AdminRoute><Facturacion /></AdminRoute>} />
+              <Route path="/tp" element={<AdminRoute><TP /></AdminRoute>} />
             </Routes>
           </Container>
         </Box>
