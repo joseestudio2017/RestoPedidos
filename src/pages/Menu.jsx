@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMenu } from '../contexts/MenuContext';
 import { useCart } from '../contexts/CartContext';
+import { useRole } from '../contexts/RoleContext'; // Importar el hook de rol
 import {
   Container,
   Typography,
@@ -19,11 +21,17 @@ import {
 const Menu = () => {
   const { menu } = useMenu();
   const { addToCart } = useCart();
+  const { role } = useRole(); // Obtener el rol actual
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleAddToCart = (item) => {
     addToCart(item);
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/profile');
   };
 
   return (
@@ -36,7 +44,6 @@ const Menu = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: 'calc(100vh - 64px)',
-
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -44,10 +51,9 @@ const Menu = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(255, 255, 255, 0.88)', // Aumenta la opacidad para mejorar contraste
+          backgroundColor: 'rgba(255, 255, 255, 0.88)',
           zIndex: 0,
         },
-
         '> *': {
           position: 'relative',
           zIndex: 1,
@@ -119,14 +125,25 @@ const Menu = () => {
                       </Box>
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'center', p: 2 }}>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => handleAddToCart(item)}
-                        sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
-                      >
-                        Añadir al Carrito
-                      </Button>
+                      {role ? (
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => handleAddToCart(item)}
+                          sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+                        >
+                          Añadir al Carrito
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleLoginRedirect}
+                          sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+                        >
+                          Ingresar como Cliente
+                        </Button>
+                      )}
                     </CardActions>
                   </Card>
                 </Grid>
