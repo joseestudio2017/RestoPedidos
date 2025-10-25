@@ -4,7 +4,8 @@ import { useOrders } from '../contexts/OrdersContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Box, Grid, Card, CardContent, CardMedia,
-  Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton, FormControl, InputLabel, Select, MenuItem, FormHelperText
+  Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton, 
+  FormControl, InputLabel, Select, MenuItem, FormHelperText, useTheme, useMediaQuery
 } from '@mui/material';
 import {
   AddCircleOutline, RemoveCircleOutline, DeleteOutline
@@ -14,6 +15,8 @@ const Carrito = () => {
   const { cartItems, updateItemQuantity, removeFromCart, clearCart } = useCart();
   const { addOrder } = useOrders();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [orderType, setOrderType] = useState('table');
   const [customerName, setCustomerName] = useState('');
@@ -55,39 +58,35 @@ const Carrito = () => {
       ...(orderType === 'table' && { tableNumber: tableNumber }),
     };
 
-    // addOrder now returns the full order with ID
     const newOrder = addOrder(orderPayload);
-    
     clearCart();
-    
-    // Navigate with the complete order object
     navigate('/facturacion', { state: { order: newOrder } });
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 6, fontWeight: 800 }}>
+    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
+      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 3 : 6, fontWeight: 800 }}>
         Tu Carrito
       </Typography>
       {cartItems.length === 0 ? (
         <Typography variant="h5" align="center" color="text.secondary">Tu carrito está vacío.</Typography>
       ) : (
-        <Grid container spacing={4}>
+        <Grid container spacing={isMobile ? 2 : 4}>
           <Grid item xs={12} md={8}>
             {cartItems.map((item) => (
-                 <Card key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center' }}>
+                 <Card key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
                  <CardMedia
                    component="img"
-                   sx={{ width: 120, height: 120, objectFit: 'cover' }}
+                   sx={{ width: isMobile ? '100%' : 120, height: isMobile ? 150 : 120, objectFit: 'cover' }}
                    image={item.image || 'https://via.placeholder.com/150'}
                    alt={item.name}
                  />
-                 <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                 <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
                    <CardContent>
                      <Typography component="div" variant="h6">{item.name}</Typography>
                      <Typography variant="subtitle1" color="text.secondary" component="div">${item.price.toFixed(2)}</Typography>
                    </CardContent>
-                   <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 1 }}>
+                   <Box sx={{ display: 'flex', alignItems: 'center', pl: isMobile ? 1 : 2, pb: 1 }}>
                      <IconButton onClick={() => updateItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
                        <RemoveCircleOutline />
                      </IconButton>
@@ -104,7 +103,7 @@ const Carrito = () => {
             ))}
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: 3, position: 'sticky', top: 20 }}>
+            <Paper elevation={3} sx={{ p: isMobile ? 2 : 3, position: isMobile ? 'static' : 'sticky', top: 20 }}>
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Opciones del Pedido</Typography>
               <ToggleButtonGroup
                 value={orderType}
@@ -112,6 +111,7 @@ const Carrito = () => {
                 onChange={handleOrderTypeChange}
                 fullWidth
                 sx={{ mb: 2 }}
+                orientation={isMobile ? 'vertical' : 'horizontal'}
               >
                 <ToggleButton value="table">Para Mesa</ToggleButton>
                 <ToggleButton value="takeaway">Para Llevar</ToggleButton>

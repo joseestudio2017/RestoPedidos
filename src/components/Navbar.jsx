@@ -141,14 +141,14 @@ export default function Navbar() {
                 {item.name}
               </Button>
             ))}
-          </Box>
-        )}
-         {role && (
+            {role && (
               <Button color="inherit" onClick={handleLogout} sx={{ color: 'white' }}>
                 <LogoutIcon sx={{ mr: 1 }}/>
                 Logout
               </Button>
             )}
+          </Box>
+        )}
       </Toolbar>
       <Drawer
         anchor="right"

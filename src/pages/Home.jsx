@@ -5,9 +5,14 @@ import {
   Typography,
   Button,
   Container,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 
 const Home = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Box
       sx={{
@@ -37,10 +42,11 @@ const Home = () => {
         sx={{
           textAlign: 'center',
           color: 'white',
+          px: isMobile ? 2 : 4, // More padding on larger screens
         }}
       >
         <Typography
-          variant="h1"
+          variant={isMobile ? 'h2' : 'h1'}
           component="h1"
           sx={{
             fontWeight: '900',
@@ -52,7 +58,7 @@ const Home = () => {
           RestoPedidos
         </Typography>
         <Typography
-          variant="h5"
+          variant={isMobile ? 'h6' : 'h5'}
           component="p"
           sx={{
             mt: 2,
@@ -69,9 +75,9 @@ const Home = () => {
           to="/menu"
           variant="contained"
           color="secondary"
-          size="large"
+          size={isMobile ? 'medium' : 'large'}
           sx={{
-            fontSize: '1.2rem',
+            fontSize: isMobile ? '1rem' : '1.2rem',
             py: 1.5,
             px: 4,
             boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
