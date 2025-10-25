@@ -5,7 +5,9 @@ import {
   Button,
   Grid,
   Typography,
-  CircularProgress
+  CircularProgress,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 
 function CreditCardForm({ onPaymentSuccess, orderTotal }) {
@@ -17,6 +19,8 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState({});
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,16 +45,14 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
     }
 
     setIsProcessing(true);
-    // Simula la llamada a una pasarela de pago (ej. Stripe)
     setTimeout(() => {
       setIsProcessing(false);
-      // Si la llamada es exitosa, se ejecuta la función del padre
       onPaymentSuccess();
-    }, 2500); // Simula un retraso de 2.5 segundos
+    }, 2500);
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ px: isMobile ? 1 : 0 }}>
       <Typography variant="h6" gutterBottom>Datos de la Tarjeta</Typography>
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -82,7 +84,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
           <TextField
             required
             fullWidth
-            label="Vencimiento (MM/AA)"
+            label="Vencimiento"
             name="expiry"
             value={cardData.expiry}
             onChange={handleChange}
@@ -112,7 +114,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
                 color="success" 
                 fullWidth 
                 size="large" 
-                sx={{ mt: 2, py: 1.5, fontSize: '1.2rem' }}
+                sx={{ mt: 2, py: 1.5, fontSize: isMobile ? '1rem' : '1.2rem' }}
                 disabled={isProcessing}
              >
                 {isProcessing ? <CircularProgress size={26} color="inherit" /> : `Pagar $${orderTotal.toFixed(2)}`}

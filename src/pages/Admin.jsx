@@ -24,6 +24,8 @@ import {
   Input,
   Divider,
   CardActions,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -44,17 +46,18 @@ function TabPanel(props) {
       aria-labelledby={`admin-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: { xs: 1, sm: 3 } }}>{children}</Box>}
     </div>
   );
 }
 
-// VERSIÓN FINAL Y CORREGIDA
 const Admin = () => {
   const { menu, addCategory, updateCategory, deleteCategory, addItem, updateItem, deleteItem } = useMenu();
   const [tabValue, setTabValue] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogData, setDialogData] = useState({ type: '', data: null, categoryId: null });
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -67,13 +70,11 @@ const Admin = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    // Pequeño retraso para evitar ver datos viejos al cerrar
     setTimeout(() => setDialogData({ type: '', data: null, categoryId: null }), 150);
   };
 
   const handleSubmitDialog = (formData) => {
     const { type, categoryId, data } = dialogData;
-    // Aseguramos que el precio sea un número válido o 0
     const price = parseFloat(formData.price);
     const safePrice = isNaN(price) ? 0 : price;
 
@@ -90,14 +91,21 @@ const Admin = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 4, fontWeight: 800 }}>
+    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
+      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 2 : 4, fontWeight: 800 }}>
         Panel de Administración
       </Typography>
       <Paper sx={{ width: '100%' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} centered indicatorColor="secondary" textColor="inherit">
-          <Tab icon={<CategoryIcon />} label="Gestionar Categorías" />
-          <Tab icon={<FastfoodIcon />} label="Gestionar Artículos" />
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          centered 
+          indicatorColor="secondary" 
+          textColor="inherit"
+          variant={isMobile ? 'fullWidth' : 'standard'}
+        >
+          <Tab icon={<CategoryIcon />} label={isMobile ? '' : 'Gestionar Categorías'} aria-label="categorías" />
+          <Tab icon={<FastfoodIcon />} label={isMobile ? '' : 'Gestionar Artículos'} aria-label="artículos" />
         </Tabs>
       </Paper>
       
@@ -132,13 +140,13 @@ const Admin = () => {
       <TabPanel value={tabValue} index={1}>
         {menu.map(category => (
           <Box key={category.id} sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h4">{category.name}</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
+              <Typography variant={isMobile ? 'h5' : 'h4'}>{category.name}</Typography>
               <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => handleOpenDialog('addItem', null, category.id)}>
                 Añadir Artículo
               </Button>
             </Box>
-            <Grid container spacing={3}>
+            <Grid container spacing={isMobile ? 2 : 3}>
               {(category.items || []).map(item => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
                   <Card>
@@ -193,7 +201,6 @@ const AdminFormDialog = ({ open, onClose, onSubmit, dialogData }) => {
       });
       setImagePreview(initialData.image || null);
     } else {
-      // Limpiar al cerrar para evitar flashes de contenido antiguo
       setFormData({ name: '', description: '', price: '', image: null });
       setImagePreview(null);
     }

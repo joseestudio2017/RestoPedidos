@@ -1,12 +1,14 @@
 import React from 'react';
 import { useOrders } from '../contexts/OrdersContext';
-import { Container, Typography, Paper, Grid, Button, Box, Chip, Divider } from '@mui/material';
+import { Container, Typography, Paper, Grid, Button, Box, Chip, Divider, useTheme, useMediaQuery } from '@mui/material';
 import { Fastfood, Restaurant, CheckCircle } from '@mui/icons-material';
 
 const Mozo = () => {
   const { orders, updateOrderStatus } = useOrders();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const activeOrders = orders.filter(order => order.status !== 'Entregado');
+  const activeOrders = orders.filter(order => order.status !== 'entregado');
 
   const handleUpdateStatus = (orderId, newStatus) => {
     updateOrderStatus(orderId, newStatus);
@@ -14,9 +16,9 @@ const Mozo = () => {
 
   const getOrderStatusChip = (status) => {
     switch (status) {
-      case 'Pendiente':
+      case 'pendiente':
         return <Chip label="Pendiente" color="error" />;
-      case 'En Preparación':
+      case 'en preparacion':
         return <Chip label="En Preparación" color="warning" />;
       default:
         return <Chip label={status} />;
@@ -58,12 +60,12 @@ const Mozo = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 6, fontWeight: 800 }}>
+    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
+      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 3 : 6, fontWeight: 800 }}>
         Panel de Pedidos
       </Typography>
       {activeOrders.length > 0 ? (
-        <Grid container spacing={3}>
+        <Grid container spacing={isMobile ? 2 : 3}>
           {activeOrders.map((order) => (
             <Grid item xs={12} sm={6} md={4} key={order.id}>
               <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2 }}>
@@ -83,22 +85,22 @@ const Mozo = () => {
                 </Box>
                 <Divider sx={{ my: 1 }} />
                 <Box sx={{ mt: 'auto' }}>
-                  {order.status === 'Pendiente' && (
+                  {order.status === 'pendiente' && (
                     <Button
                       variant="contained"
                       color="warning"
                       fullWidth
-                      onClick={() => handleUpdateStatus(order.id, 'En Preparación')}
+                      onClick={() => handleUpdateStatus(order.id, 'en preparacion')}
                     >
                       Marcar como En Preparación
                     </Button>
                   )}
-                  {order.status === 'En Preparación' && (
+                  {order.status === 'en preparacion' && (
                     <Button
                       variant="contained"
                       color="success"
                       fullWidth
-                      onClick={() => handleUpdateStatus(order.id, 'Entregado')}
+                      onClick={() => handleUpdateStatus(order.id, 'entregado')}
                       startIcon={<CheckCircle />}
                     >
                       Entregar

@@ -16,12 +16,19 @@ const Home = () => {
   return (
     <Box
       sx={{
-        height: 'calc(100vh - 64px)', // Altura total menos la barra de navegación
+        height: 'calc(100vh - 64px)', // Asume que el AppBar tiene 64px de altura
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        overflow: 'hidden',
+        // La imagen de fondo se define aquí
+        backgroundImage: 'url(https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
+        backgroundSize: 'cover', // Asegura que la imagen cubra todo el espacio
+        backgroundPosition: 'center', // Centra la imagen
+        color: 'white',
+        textAlign: 'center',
+
+        // Superposición para oscurecer la imagen y mejorar la legibilidad del texto
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -29,22 +36,18 @@ const Home = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url(https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'brightness(0.6)',
-          zIndex: -1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semitransparente
+        },
+
+        // Asegura que el contenido (texto, botón) esté por encima de la superposición
+        // Usamos '> *' para aplicar esto a todos los hijos directos del Box
+        '> *': {
+          position: 'relative',
+          zIndex: 1,
         },
       }}
     >
-      <Container
-        maxWidth="md"
-        sx={{
-          textAlign: 'center',
-          color: 'white',
-          px: isMobile ? 2 : 4, // More padding on larger screens
-        }}
-      >
+      <Container maxWidth="md">
         <Typography
           variant={isMobile ? 'h2' : 'h1'}
           component="h1"
@@ -52,7 +55,7 @@ const Home = () => {
             fontWeight: '900',
             textTransform: 'uppercase',
             letterSpacing: '2px',
-            textShadow: '3px 3px 8px rgba(0,0,0,0.7)',
+            textShadow: '3px 3px 8px rgba(0,0,0,0.7)', // Sombra para el texto
           }}
         >
           RestoPedidos
@@ -80,7 +83,7 @@ const Home = () => {
             fontSize: isMobile ? '1rem' : '1.2rem',
             py: 1.5,
             px: 4,
-            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.4)', // Sombra para el botón
           }}
         >
           Ver Menú

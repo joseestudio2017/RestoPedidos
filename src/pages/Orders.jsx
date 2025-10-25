@@ -12,43 +12,41 @@ import {
   List,
   ListItem,
   ListItemText,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { Fastfood, Done, Restaurant } from '@mui/icons-material';
 
-// Componente para mostrar un chip de estado visualmente distintivo
 const getStatusChip = (status) => {
   switch (status) {
     case 'pendiente':
-      // El estado "Pendiente" es ahora más sutil (contorno)
       return <Chip icon={<Restaurant />} label="Pendiente" color="info" variant="outlined" />;
     case 'en preparacion':
-      // ¡NUEVO! "En Preparación" ahora es el estado destacado con el color naranja/warning.
       return <Chip icon={<Fastfood />} label="En Preparación" color="warning" variant="contained" />;
     case 'entregado':
       return <Chip icon={<Done />} label="Entregado" color="success" variant="outlined" />;
     default:
-      // Un estado por defecto claro para la depuración
       return <Chip label={status ? `Desconocido: ${status}` : 'Sin Estado'} />;
   }
 };
 
-// Vista de "Mis Pedidos" para el CLIENTE
 const Orders = () => {
   const { orders } = useOrders();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Muestra los pedidos más recientes primero
   const customerOrders = orders.slice().sort((a, b) => b.timestamp - a.timestamp);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: 6, fontWeight: 800 }}>
+    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
+      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 3 : 6, fontWeight: 800 }}>
         Mis Pedidos
       </Typography>
 
       {customerOrders.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Restaurant sx={{ fontSize: 80, color: 'text.secondary' }} />
-          <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
+          <Restaurant sx={{ fontSize: isMobile ? 60 : 80, color: 'text.secondary' }} />
+          <Typography variant={isMobile ? 'h5' : 'h4'} gutterBottom sx={{ mt: 2 }}>
             Aún no tienes pedidos
           </Typography>
           <Typography variant="h6" color="text.secondary">
@@ -56,7 +54,7 @@ const Orders = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={4}>
+        <Grid container spacing={isMobile ? 2 : 4}>
           {customerOrders.map((order) => (
             <Grid item key={order.id} xs={12} sm={6} md={4}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
