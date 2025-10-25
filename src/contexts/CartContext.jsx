@@ -18,6 +18,19 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const decreaseFromCart = (itemId) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((i) => i.id === itemId);
+      if (existingItem.quantity === 1) {
+        return prevItems.filter((i) => i.id !== itemId);
+      } else {
+        return prevItems.map((i) =>
+          i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
+        );
+      }
+    });
+  };
+
   const removeFromCart = (itemId) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
@@ -43,6 +56,7 @@ export const CartProvider = ({ children }) => {
       value={{
         cartItems,
         addToCart,
+        decreaseFromCart, // <- Exportar la nueva función
         removeFromCart,
         updateItemQuantity,
         clearCart,
