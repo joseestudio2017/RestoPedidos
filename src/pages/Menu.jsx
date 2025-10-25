@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMenu } from '../contexts/MenuContext';
 import { useCart } from '../contexts/CartContext';
-import { useRole } from '../contexts/RoleContext'; // Importar el hook de rol
+import { useRole } from '../contexts/RoleContext';
 import {
   Container,
   Typography,
@@ -21,7 +21,7 @@ import {
 const Menu = () => {
   const { menu } = useMenu();
   const { addToCart } = useCart();
-  const { role } = useRole(); // Obtener el rol actual
+  const { role } = useRole();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -34,13 +34,110 @@ const Menu = () => {
     navigate('/profile');
   };
 
+  const renderMenuItems = (items) => {
+    const cardComponent = (item) => (
+      <Card sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        boxShadow: theme.shadows[6],
+        borderRadius: '12px',
+        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.03)',
+          boxShadow: theme.shadows[10],
+        }
+      }}>
+        <CardMedia
+          component="img"
+          height="220"
+          image={item.image}
+          alt={item.name}
+        />
+        <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+          <Typography gutterBottom variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+            {item.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ minHeight: '4.5em' }}>
+            {item.description}
+          </Typography>
+          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+            <Chip 
+              label={`$${item.price.toFixed(2)}`} 
+              color="primary" 
+              sx={{ fontSize: '1.1rem', fontWeight: 'bold', py: 2, px: 1 }} 
+            />
+          </Box>
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'center', p: 2 }}>
+          {role ? (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleAddToCart(item)}
+              sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+            >
+              Añadir al Carrito
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleLoginRedirect}
+              sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
+            >
+              Ingresar como Cliente
+            </Button>
+          )}
+        </CardActions>
+      </Card>
+    );
+
+    if (isMobile) {
+      return (
+        <Box sx={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: 2,
+          p: 1,
+          pb: 2,
+          scrollSnapType: 'x mandatory', // Habilitar el snap en el contenedor
+          '&::-webkit-scrollbar': { display: 'none' },
+          '-ms-overflow-style': 'none', 
+          'scrollbar-width': 'none', 
+        }}>
+          {items.map((item) => (
+            <Box key={item.id} sx={{ 
+              width: '90vw', // Cada tarjeta ocupa el 90% del ancho de la pantalla
+              maxWidth: '400px', // Un límite máximo para tablets pequeñas
+              flexShrink: 0,
+              scrollSnapAlign: 'center', // Alinear cada tarjeta al centro al hacer snap
+            }}>
+              {cardComponent(item)}
+            </Box>
+          ))}
+        </Box>
+      );
+    }
+
+    return (
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        {items.map((item) => (
+          <Grid item key={item.id} xs={12} sm={6} md={4} lg={3}>
+            {cardComponent(item)}
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
   return (
     <Box
       sx={{
         position: 'relative',
         py: { xs: 3, md: 5 },
         backgroundImage: 'url(https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: 'calc(100vh - 64px)',
@@ -88,67 +185,7 @@ const Menu = () => {
             >
               {category.name}
             </Typography>
-            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-              {category.items.map((item) => (
-                <Grid item key={item.id} xs={12} sm={6} md={4} lg={3}>
-                  <Card sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    boxShadow: theme.shadows[6],
-                    borderRadius: '12px',
-                    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                    '&:hover': {
-                      transform: 'scale(1.03)',
-                      boxShadow: theme.shadows[10],
-                    }
-                  }}>
-                    <CardMedia
-                      component="img"
-                      height="220"
-                      image={item.image}
-                      alt={item.name}
-                    />
-                    <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-                      <Typography gutterBottom variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-                        {item.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ minHeight: '4.5em' }}>
-                        {item.description}
-                      </Typography>
-                      <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                        <Chip 
-                          label={`$${item.price.toFixed(2)}`} 
-                          color="primary" 
-                          sx={{ fontSize: '1.1rem', fontWeight: 'bold', py: 2, px: 1 }} 
-                        />
-                      </Box>
-                    </CardContent>
-                    <CardActions sx={{ justifyContent: 'center', p: 2 }}>
-                      {role ? (
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => handleAddToCart(item)}
-                          sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
-                        >
-                          Añadir al Carrito
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleLoginRedirect}
-                          sx={{ width: '90%', py: 1.5, fontSize: '1rem' }}
-                        >
-                          Ingresar como Cliente
-                        </Button>
-                      )}
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+            {renderMenuItems(category.items)}
           </Box>
         ))}
       </Container>

@@ -8,7 +8,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 
 ### Estilo y Diseño (Rediseño Moderno)
 
-*   **Inspiración:** Diseño moderno, limpio y vibrante, inspirado en cadenas de comida rápida como McDonald's, utilizando colores llamativos y un diseño espacioso.
+*   **Inspiración:** Diseño moderno, limpio y vibrante, inspirado en cadenas de comida rápida como McDonald\'s, utilizando colores llamativos y un diseño espacioso.
 *   **Paleta de Colores:**
     *   Primario: Rojo (`#D7231D`)
     *   Secundario/Acento: Amarillo (`#FFC72C`)
@@ -18,7 +18,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 *   **Componentes:** Basado en Material-UI (MUI), con estilos personalizados para lograr un aspecto único (bordes redondeados, sombras suaves, efectos de hover).
 *   **Layout General:** Diseño a pantalla completa (`full-width`) y totalmente responsivo para una experiencia consistente en dispositivos móviles y de escritorio.
 *   **Página de Inicio:** Presenta un banner hero a pantalla completa con una imagen de fondo de alta calidad, el título "RestoPedidos" superpuesto con una tipografía impactante y un botón de llamada a la acción claro para "Ver Menú".
-*   **Página de Menú:** Diseño de cuadrícula (grid) que muestra los artículos en tarjetas modernas. Cada tarjeta incluye imagen, nombre, descripción, precio y un botón prominente para "Añadir al Carrito".
+*   **Página de Menú:** Diseño de cuadrícula (grid) en escritorio. Cada tarjeta incluye una **imagen de alta calidad y relevante del producto**, nombre, descripción, precio y un botón prominente para "Añadir al Carrito". **En dispositivos móviles, las categorías se presentan como carruseles horizontales con efecto *scroll-snapping*, mostrando una tarjeta a la vez para una navegación enfocada y táctil.**
 *   **Página del Carrito:** Diseño de dos columnas en pantallas grandes, con la lista de artículos a la izquierda y un resumen del pedido fijo a la derecha. La interfaz está optimizada para ajustar cantidades y finalizar la compra de forma sencilla.
 *   **Página de Pedidos:** Los pedidos se muestran en tarjetas individuales en una cuadrícula. El estado de cada pedido (`Pendiente`, `En Preparación`, `Entregado`) se indica visualmente con "Chips" de colores y se avanza con botones de acción claros.
 *   **Panel de Administración:** Interfaz organizada con pestañas para separar la gestión de "Categorías" y "Artículos". El alta y la edición se realizan a través de formularios en ventanas de diálogo (`Dialog`) para no sobrecargar la pantalla principal.
@@ -30,6 +30,8 @@ Este documento describe la estructura, características y plan de desarrollo par
 *   **Proceso de Pedido Simplificado:** Flujo de pedido claro donde el cliente puede especificar si es para llevar o para comer en el local, y finalizar la compra.
 *   **Seguimiento de Pedidos en Tiempo Real:** El personal puede ver los pedidos entrantes y actualizar su estado a medida que avanzan en la cocina, desde "Pendiente" hasta "Entregado".
 *   **Contexto Global:** La aplicación utiliza React Context para gestionar el estado del menú, el carrito y los pedidos de forma centralizada y eficiente.
+*   **Carrusel con Scroll Snapping:** En la vista móvil, el menú utiliza un carrusel con efecto de "enganche" (scroll snapping), que centra una tarjeta a la vez para mejorar la visibilidad y la interacción con cada producto.
+*   **Acceso Condicional:** El menú muestra dinámicamente opciones para 'Añadir al Carrito' o 'Ingresar como Cliente' dependiendo de si el usuario ha seleccionado un perfil, guiando a los visitantes a iniciar sesión.
 
 ## Plan de Desarrollo
 
@@ -44,18 +46,19 @@ Este documento describe la estructura, características y plan de desarrollo par
 *   **HECHO:** Crear `MenuContext` para la gestión del menú (CRUD).
 *   **HECHO:** Crear `CartContext` para la funcionalidad del carrito de compras.
 *   **HECHO:** Crear `OrdersContext` para la gestión de pedidos.
+*   **HECHO:** Crear `RoleContext` para la selección de perfiles de usuario.
 
 ### Fase 3: Rediseño Moderno de la UI/UX ✅
 
 1.  **HECHO:** Definir y aplicar un nuevo tema moderno en `App.jsx` (colores, tipografía, estilos de componentes).
 2.  **HECHO:** Rediseñar `Home.jsx` con un banner a pantalla completa y una llamada a la acción clara.
-3.  **HECHO:** Rediseñar `Menu.jsx` con un diseño de cuadrícula y tarjetas de producto mejoradas.
+3.  **HECHO:** Rediseñar `Menu.jsx` con un diseño de cuadrícula, **implementando un carrusel responsivo con *scroll-snapping* para la vista móvil y añadiendo imágenes de alta calidad para cada producto**.
 4.  **HECHO:** Rediseñar `Cart.jsx` con un diseño de dos columnas, resumen de pedido y flujo de pago simplificado.
 5.  **HECHO:** Rediseñar `Orders.jsx` con tarjetas de pedido, chips de estado visuales y botones de acción.
 6.  **HECHO:** Rediseñar `Admin.jsx` con una interfaz de pestañas y formularios en diálogos para una mejor organización.
 
 ## Próximos Pasos
 
-*   **Autenticación y Roles:** Implementar un sistema de inicio de sesión para diferenciar entre Clientes, Personal y Administradores.
+*   **Autenticación y Roles:** Implementar un sistema de inicio de sesión completo para diferenciar entre Clientes, Personal y Administradores.
 *   **Persistencia de Datos:** Integrar la aplicación con un backend como Firebase (Firestore) para que los datos (menú, pedidos, usuarios) sean persistentes.
 *   **Funcionalidades Avanzadas:** Añadir características como búsqueda de productos, filtrado de menú, historial de pedidos para clientes, y notificaciones.
