@@ -4,6 +4,8 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [numberOfChairs, setNumberOfChairs] = useState(null);
 
   const addToCart = (item) => {
     setCartItems((prevItems) => {
@@ -43,8 +45,15 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const setTable = (tableId, chairs) => {
+    setSelectedTable(tableId);
+    setNumberOfChairs(chairs);
+  };
+
   const clearCart = () => {
     setCartItems([]);
+    setSelectedTable(null);
+    setNumberOfChairs(null);
   };
 
   const getTotalPrice = () => {
@@ -55,10 +64,13 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider
       value={{
         cartItems,
+        selectedTable,
+        numberOfChairs,
         addToCart,
-        decreaseFromCart, // <- Exportar la nueva función
+        decreaseFromCart,
         removeFromCart,
         updateItemQuantity,
+        setTable,
         clearCart,
         getTotalPrice,
       }}

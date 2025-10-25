@@ -119,7 +119,7 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'primary.main', boxShadow: theme.shadows[2] }}>
+    <AppBar position="sticky" sx={{ backgroundColor: 'primary.main', boxShadow: theme.shadows[2] }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Button 
           color="inherit" 

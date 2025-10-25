@@ -19,7 +19,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 *   **Layout General:** Diseño a pantalla completa (`full-width`) y totalmente responsivo para una experiencia consistente en dispositivos móviles y de escritorio.
 *   **Página de Inicio:** Presenta un banner hero a pantalla completa con una imagen de fondo de alta calidad, el título "RestoPedidos" superpuesto con una tipografía impactante y un botón de llamada a la acción claro para "Ver Menú".
 *   **Página de Menú:** Diseño de cuadrícula (grid) en escritorio. Cada tarjeta incluye imagen, nombre, descripción, precio y un **controlador de cantidad interactivo**: el botón 'Añadir al Carrito' se transforma en un selector (+/-) una vez que el producto está en el carrito. **En dispositivos móviles, las categorías se presentan como carruseles horizontales con efecto *scroll-snapping*, mostrando una tarjeta a la vez para una navegación enfocada y táctil.**
-*   **Página del Carrito:** Diseño de dos columnas en pantallas grandes, con la lista de artículos a la izquierda y un resumen del pedido fijo a la derecha. La interfaz está optimizada para ajustar cantidades y finalizar la compra de forma sencilla.
+*   **Página del Carrito:** Diseño de dos columnas en pantallas grandes, con la lista de artículos a la izquierda y un resumen del pedido fijo a la derecha. Para los pedidos "Para Mesa", incluye un **selector de mesas visual e interactivo** que se abre en un modal, permitiendo a los clientes elegir su ubicación en un plano del restaurante.
 *   **Página de Pedidos:** Los pedidos se muestran en tarjetas individuales en una cuadrícula. El estado de cada pedido (`Pendiente`, `En Preparación`, `Entregado`) se indica visualmente con "Chips" de colores y se avanza con botones de acción claros.
 *   **Panel de Administración:** Interfaz organizada con pestañas para separar la gestión de "Categorías" y "Artículos". El alta y la edición se realizan a través de formularios en ventanas de diálogo (`Dialog`) para no sobrecargar la pantalla principal.
 
@@ -27,6 +27,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 
 *   **Gestión Completa del Menú:** Los administradores pueden crear, leer, actualizar y eliminar categorías y artículos del menú a través de una interfaz amigable.
 *   **Carrito de Compras Interactivo:** Los clientes pueden añadir/eliminar artículos, ajustar cantidades y ver el subtotal actualizado en tiempo real.
+*   **Selector Visual de Mesas:** Cuando un cliente elige "Comer en el Local", se presenta un plano interactivo del restaurante en una ventana modal. Los clientes pueden ver mesas disponibles/ocupadas y seleccionar su preferida, que se resalta visualmente, similar a la selección de asientos en un cine.
 *   **Controlador de Cantidad Dinámico:** El botón 'Añadir al Carrito' se convierte en un controlador de cantidad (+/-) al añadir un producto, permitiendo un ajuste rápido y visual desde la misma página del menú. Si la cantidad se reduce a cero, el botón original reaparece.
 *   **Proceso de Pedido Simplificado:** Flujo de pedido claro donde el cliente puede especificar si es para llevar o para comer en el local, y finalizar la compra.
 *   **Seguimiento de Pedidos en Tiempo Real:** El personal puede ver los pedidos entrantes y actualizar su estado a medida que avanzan en la cocina, desde "Pendiente" hasta "Entregado".
@@ -45,7 +46,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 ### Fase 2: Lógica de Negocio (Contextos) ✅
 
 *   **HECHO:** Crear `MenuContext` para la gestión del menú (CRUD).
-*   **HECHO:** Crear `CartContext` para la funcionalidad del carrito de compras (incluyendo la lógica para el controlador de cantidad).
+*   **HECHO:** Crear `CartContext` para la funcionalidad del carrito de compras (incluyendo la lógica para el controlador de cantidad y la selección de mesa).
 *   **HECHO:** Crear `OrdersContext` para la gestión de pedidos.
 *   **HECHO:** Crear `RoleContext` para la selección de perfiles de usuario.
 
@@ -54,7 +55,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 1.  **HECHO:** Definir y aplicar un nuevo tema moderno en `App.jsx` (colores, tipografía, estilos de componentes).
 2.  **HECHO:** Rediseñar `Home.jsx` con un banner a pantalla completa y una llamada a la acción clara.
 3.  **HECHO:** Rediseñar `Menu.jsx` implementando un carrusel responsivo con *scroll-snapping* y un controlador de cantidad dinámico en las tarjetas de producto.
-4.  **HECHO:** Rediseñar `Cart.jsx` con un diseño de dos columnas, resumen de pedido y flujo de pago simplificado.
+4.  **HECHO:** Rediseñar `Carrito.jsx` con un diseño de dos columnas e implementando un selector de mesas visual e interactivo.
 5.  **HECHO:** Rediseñar `Orders.jsx` con tarjetas de pedido, chips de estado visuales y botones de acción.
 6.  **HECHO:** Rediseñar `Admin.jsx` con una interfaz de pestañas y formularios en diálogos para una mejor organización.
 

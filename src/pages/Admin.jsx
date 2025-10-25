@@ -84,7 +84,7 @@ const Admin = () => {
     } else if (type === 'addItem') {
       addItem(categoryId, { ...formData, price: safePrice });
     } else if (type === 'editItem') {
-      updateItem(categoryId, data.id, { ...formData, price: safePrice });
+      updateItem(data.id, { ...formData, price: safePrice });
     }
     handleCloseDialog();
   };
@@ -163,7 +163,7 @@ const Admin = () => {
                       <IconButton aria-label="edit" onClick={() => handleOpenDialog('editItem', item, category.id)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton aria-label="delete" onClick={() => deleteItem(category.id, item.id)}>
+                      <IconButton aria-label="delete" onClick={() => deleteItem(item.id)}>
                         <DeleteIcon color="error" />
                       </IconButton>
                     </CardActions>

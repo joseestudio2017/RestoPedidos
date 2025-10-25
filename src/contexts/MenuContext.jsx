@@ -1,4 +1,17 @@
-import React, { createContext, useState, useContext } from 'react';
+
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { db } from '../firebase';
+import { 
+    collection, 
+    getDocs, 
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    doc, 
+    writeBatch, 
+    query, 
+    where 
+} from 'firebase/firestore';
 
 const MenuContext = createContext();
 
@@ -57,74 +70,124 @@ const initialMenu = [
 ];
 
 export const MenuProvider = ({ children }) => {
-  const [menu, setMenu] = useState(initialMenu);
+    const [menu, setMenu] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const addCategory = (categoryName) => {
-    setMenu((prevMenu) => [
-      ...prevMenu,
-      { id: `cat${Date.now()}`, name: categoryName, items: [] },
-    ]);
-  };
+    const seedDatabase = async () => {
+        console.log("Seeding database...");
+        const batch = writeBatch(db);
+        
+        initialMenu.forEach(category => {
+            const categoryRef = doc(db, 'categories', category.id);
+            batch.set(categoryRef, { name: category.name });
+            
+            category.items.forEach(item => {
+                const itemRef = doc(db, 'items', item.id);
+                const { id, ...itemData } = item; // Don't store id in the doc body
+                batch.set(itemRef, { ...itemData, categoryId: category.id });
+            });
+        });
 
-  const updateCategory = (categoryId, newName) => {
-    setMenu((prevMenu) =>
-      prevMenu.map((cat) =>
-        cat.id === categoryId ? { ...cat, name: newName } : cat
-      )
+        await batch.commit();
+        console.log("Database seeded.");
+    };
+
+    const fetchMenu = async () => {
+        setLoading(true);
+        try {
+            const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+            if (categoriesSnapshot.empty) {
+                await seedDatabase();
+            }
+
+            const categoriesCol = collection(db, 'categories');
+            const itemsCol = collection(db, 'items');
+
+            const [categorySnapshot, itemSnapshot] = await Promise.all([
+                getDocs(categoriesCol),
+                getDocs(itemsCol)
+            ]);
+
+            const categories = categorySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const items = itemSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const combinedMenu = categories.map(category => ({
+                ...category,
+                items: items.filter(item => item.categoryId === category.id).sort((a, b) => a.name.localeCompare(b.name))
+            })).sort((a, b) => a.name.localeCompare(b.name));
+
+            setMenu(combinedMenu);
+        } catch (error) {
+            console.error("Error fetching menu:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchMenu();
+    }, []);
+
+    const addCategory = async (categoryName) => {
+        if (!categoryName) return;
+        await addDoc(collection(db, "categories"), { name: categoryName });
+        await fetchMenu();
+    };
+
+    const updateCategory = async (categoryId, newName) => {
+        const categoryDoc = doc(db, "categories", categoryId);
+        await updateDoc(categoryDoc, { name: newName });
+        await fetchMenu();
+    };
+
+    const deleteCategory = async (categoryId) => {
+        const batch = writeBatch(db);
+        const categoryDoc = doc(db, "categories", categoryId);
+        batch.delete(categoryDoc);
+
+        const q = query(collection(db, "items"), where("categoryId", "==", categoryId));
+        const itemsSnapshot = await getDocs(q);
+        itemsSnapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        await fetchMenu();
+    };
+
+    const addItem = async (categoryId, item) => {
+        await addDoc(collection(db, "items"), { ...item, categoryId });
+        await fetchMenu();
+    };
+
+    const updateItem = async (itemId, updatedItem) => {
+        const itemDoc = doc(db, "items", itemId);
+        await updateDoc(itemDoc, updatedItem);
+        await fetchMenu();
+    };
+
+    const deleteItem = async (itemId) => {
+        const itemDoc = doc(db, "items", itemId);
+        await deleteDoc(itemDoc);
+        await fetchMenu();
+    };
+
+    return (
+        <MenuContext.Provider
+            value={{
+                menu,
+                loading,
+                addCategory,
+                updateCategory,
+                deleteCategory,
+                addItem,
+                updateItem,
+                deleteItem,
+            }}
+        >
+            {children}
+        </MenuContext.Provider>
     );
-  };
-
-  const deleteCategory = (categoryId) => {
-    setMenu((prevMenu) => prevMenu.filter((cat) => cat.id !== categoryId));
-  };
-
-  const addItem = (categoryId, item) => {
-    setMenu((prevMenu) =>
-      prevMenu.map((cat) =>
-        cat.id === categoryId
-          ? { ...cat, items: [...(cat.items || []), { id: `item${Date.now()}`, ...item }] }
-          : cat
-      )
-    );
-  };
-
-  const updateItem = (categoryId, itemId, updatedItem) => {
-    setMenu((prevMenu) =>
-      prevMenu.map((cat) =>
-        cat.id === categoryId
-          ? { ...cat, items: (cat.items || []).map((item) =>
-              item.id === itemId ? { ...item, ...updatedItem } : item
-            ) }
-          : cat
-      )
-    );
-  };
-
-  const deleteItem = (categoryId, itemId) => {
-    setMenu((prevMenu) =>
-      prevMenu.map((cat) =>
-        cat.id === categoryId
-          ? { ...cat, items: (cat.items || []).filter((item) => item.id !== itemId) }
-          : cat
-      )
-    );
-  };
-
-  return (
-    <MenuContext.Provider
-      value={{
-        menu,
-        addCategory,
-        updateCategory,
-        deleteCategory,
-        addItem,
-        updateItem,
-        deleteItem,
-      }}
-    >
-      {children}
-    </MenuContext.Provider>
-  );
 };
 
 export const useMenu = () => useContext(MenuContext);

@@ -5,22 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Box, Grid, Card, CardContent, CardMedia,
   Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton, 
-  FormControl, InputLabel, Select, MenuItem, FormHelperText, useTheme 
+  Modal, FormHelperText, useTheme 
 } from '@mui/material';
 import {
   AddCircleOutline, RemoveCircleOutline, DeleteOutline
 } from '@mui/icons-material';
+import TableSelection from '../components/TableSelection';
 
 const Carrito = () => {
-  const { cartItems, updateItemQuantity, removeFromCart, clearCart } = useCart();
+  const { cartItems, selectedTable, numberOfChairs, setTable, updateItemQuantity, removeFromCart, clearCart } = useCart();
   const { addOrder } = useOrders();
   const navigate = useNavigate();
   const theme = useTheme();
 
   const [orderType, setOrderType] = useState('table');
   const [customerName, setCustomerName] = useState('');
-  const [tableNumber, setTableNumber] = useState('');
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -36,8 +37,8 @@ const Carrito = () => {
       setError('Por favor, ingresa tu nombre y apellido.');
       return false;
     }
-    if (orderType === 'table' && !tableNumber) {
-      setError('Por favor, selecciona una mesa.');
+    if (orderType === 'table' && !selectedTable) {
+      setError('Por favor, selecciona una mesa y el número de sillas.');
       return false;
     }
     setError('');
@@ -54,12 +55,17 @@ const Carrito = () => {
       total: subtotal,
       orderType: orderType,
       ...(orderType === 'takeaway' && { customerName: customerName.trim(), takeAwayNumber: `#${Math.floor(Math.random() * 1000)}` }),
-      ...(orderType === 'table' && { tableNumber: tableNumber }),
+      ...(orderType === 'table' && { tableNumber: selectedTable, chairs: numberOfChairs }),
     };
 
     const newOrder = addOrder(orderPayload);
     clearCart();
     navigate('/facturacion', { state: { order: newOrder } });
+  };
+  
+  const handleSelectTable = (tableId, chairs) => {
+    setTable(tableId, chairs);
+    setIsModalOpen(false);
   };
 
   return (
@@ -119,19 +125,18 @@ const Carrito = () => {
               </ToggleButtonGroup>
 
               {orderType === 'table' ? (
-                <FormControl fullWidth variant="outlined" error={!!error && orderType === 'table'}>
-                  <InputLabel id="table-select-label">Mesa</InputLabel>
-                  <Select
-                    labelId="table-select-label"
-                    value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
-                    label="Mesa"
-                  >
-                    {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                      <MenuItem key={n} value={n}>Mesa {n}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                 <Box>
+                    {selectedTable ? (
+                      <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>
+                        Mesa: <strong>{selectedTable}</strong> | Sillas: <strong>{numberOfChairs}</strong>
+                      </Typography>
+                    ) : (
+                      <Typography variant="h6" sx={{ mb: 1, textAlign: 'center' }}>Mesa: <strong>Ninguna</strong></Typography>
+                    )}
+                    <Button variant="outlined" onClick={() => setIsModalOpen(true)} fullWidth>
+                      {selectedTable ? 'Cambiar Mesa' : 'Seleccionar Mesa'}
+                    </Button>
+                 </Box>
               ) : (
                 <TextField
                   label="Nombre y Apellido"
@@ -165,6 +170,17 @@ const Carrito = () => {
           </Grid>
         </Grid>
       )}
+       <Modal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        aria-labelledby="table-selection-modal-title"
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}
+      >
+        <TableSelection 
+          onSelectTable={handleSelectTable} 
+          onCancel={() => setIsModalOpen(false)} 
+        />
+      </Modal>
     </Container>
   );
 };

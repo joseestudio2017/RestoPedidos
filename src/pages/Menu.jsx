@@ -16,13 +16,14 @@ import {
   Chip,
   IconButton,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 const Menu = () => {
-  const { menu } = useMenu();
+  const { menu, loading } = useMenu();
   const { cartItems, addToCart, decreaseFromCart } = useCart();
   const { role } = useRole();
   const navigate = useNavigate();
@@ -183,26 +184,32 @@ const Menu = () => {
           Nuestro Menú
         </Typography>
 
-        {menu.map((category) => (
-          <Box key={category.id} sx={{ mb: { xs: 5, md: 8 } }}>
-            <Typography 
-              variant={isMobile ? 'h4' : 'h3'} 
-              component="h2" 
-              gutterBottom 
-              sx={{ 
-                borderBottom: 3, 
-                borderColor: 'secondary.main', 
-                pb: 1, 
-                mb: { xs: 3, md: 5 }, 
-                color: '#34495E',
-                display: 'inline-block',
-              }}
-            >
-              {category.name}
-            </Typography>
-            {renderMenuItems(category.items)}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 10 }}>
+            <CircularProgress color="secondary" size={80} />
           </Box>
-        ))}
+        ) : (
+          menu.map((category) => (
+            <Box key={category.id} sx={{ mb: { xs: 5, md: 8 } }}>
+              <Typography 
+                variant={isMobile ? 'h4' : 'h3'} 
+                component="h2" 
+                gutterBottom 
+                sx={{ 
+                  borderBottom: 3, 
+                  borderColor: 'secondary.main', 
+                  pb: 1, 
+                  mb: { xs: 3, md: 5 }, 
+                  color: '#34495E',
+                  display: 'inline-block',
+                }}
+              >
+                {category.name}
+              </Typography>
+              {renderMenuItems(category.items)}
+            </Box>
+          ))
+        )}
       </Container>
     </Box>
   );
