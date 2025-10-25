@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Box, Grid, Card, CardContent, CardMedia,
   Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton, 
-  FormControl, InputLabel, Select, MenuItem, FormHelperText, useTheme, useMediaQuery
+  FormControl, InputLabel, Select, MenuItem, FormHelperText, useTheme 
 } from '@mui/material';
 import {
   AddCircleOutline, RemoveCircleOutline, DeleteOutline
@@ -16,7 +16,6 @@ const Carrito = () => {
   const { addOrder } = useOrders();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [orderType, setOrderType] = useState('table');
   const [customerName, setCustomerName] = useState('');
@@ -64,54 +63,56 @@ const Carrito = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
-      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 3 : 6, fontWeight: 800 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{ mb: { xs: 4, md: 6 }, fontWeight: 800, fontSize: { xs: '2.5rem', sm: '3.75rem' } }}>
         Tu Carrito
       </Typography>
       {cartItems.length === 0 ? (
-        <Typography variant="h5" align="center" color="text.secondary">Tu carrito está vacío.</Typography>
+        <Box textAlign="center" py={5}>
+          <Typography variant="h5" color="text.secondary">Tu carrito está vacío.</Typography>
+          <Button component="a" href="/menu" variant="contained" color="primary" sx={{ mt: 3 }}>Ir al Menú</Button>
+        </Box>
       ) : (
-        <Grid container spacing={isMobile ? 2 : 4}>
+        <Grid container spacing={{ xs: 3, md: 4 }}>
           <Grid item xs={12} md={8}>
             {cartItems.map((item) => (
-                 <Card key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
-                 <CardMedia
-                   component="img"
-                   sx={{ width: isMobile ? '100%' : 120, height: isMobile ? 150 : 120, objectFit: 'cover' }}
-                   image={item.image || 'https://via.placeholder.com/150'}
-                   alt={item.name}
-                 />
-                 <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
-                   <CardContent>
-                     <Typography component="div" variant="h6">{item.name}</Typography>
-                     <Typography variant="subtitle1" color="text.secondary" component="div">${item.price.toFixed(2)}</Typography>
-                   </CardContent>
-                   <Box sx={{ display: 'flex', alignItems: 'center', pl: isMobile ? 1 : 2, pb: 1 }}>
-                     <IconButton onClick={() => updateItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
-                       <RemoveCircleOutline />
-                     </IconButton>
-                     <TextField size="small" value={item.quantity} sx={{ width: 60, mx: 1, textAlign: 'center' }} InputProps={{ readOnly: true }}/>
-                     <IconButton onClick={() => updateItemQuantity(item.id, item.quantity + 1)}>
-                       <AddCircleOutline />
-                     </IconButton>
-                     <IconButton onClick={() => removeFromCart(item.id)} sx={{ ml: 'auto', mr: 2 }}>
-                       <DeleteOutline color="error" />
-                     </IconButton>
-                   </Box>
-                 </Box>
-               </Card>
+              <Card key={item.id} sx={{ display: 'flex', mb: 2.5, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, boxShadow: theme.shadows[2] }}>
+                <CardMedia
+                  component="img"
+                  sx={{ width: { xs: '100%', sm: 140 }, height: { xs: 160, sm: 140 }, objectFit: 'cover' }}
+                  image={item.image || 'https://via.placeholder.com/150'}
+                  alt={item.name}
+                />
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
+                  <CardContent sx={{ flex: '1 0 auto', p: { xs: 2, sm: '16px 24px' } }}>
+                    <Typography component="div" variant="h6" sx={{ fontWeight: 'bold' }}>{item.name}</Typography>
+                    <Typography variant="subtitle1" color="text.secondary" component="div">${item.price.toFixed(2)}</Typography>
+                  </CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', pl: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
+                    <IconButton onClick={() => updateItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} size="small">
+                      <RemoveCircleOutline />
+                    </IconButton>
+                    <Typography sx={{ mx: 2, fontWeight: 'bold', width: 20, textAlign: 'center' }}>{item.quantity}</Typography>
+                    <IconButton onClick={() => updateItemQuantity(item.id, item.quantity + 1)} size="small">
+                      <AddCircleOutline />
+                    </IconButton>
+                    <IconButton onClick={() => removeFromCart(item.id)} sx={{ ml: 'auto', mr: 2 }}>
+                      <DeleteOutline color="error" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Card>
             ))}
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: isMobile ? 2 : 3, position: isMobile ? 'static' : 'sticky', top: 20 }}>
+            <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, position: { md: 'sticky' }, top: 80, borderRadius: '12px' }}>
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Opciones del Pedido</Typography>
               <ToggleButtonGroup
                 value={orderType}
                 exclusive
                 onChange={handleOrderTypeChange}
                 fullWidth
-                sx={{ mb: 2 }}
-                orientation={isMobile ? 'vertical' : 'horizontal'}
+                sx={{ mb: 3 }}
               >
                 <ToggleButton value="table">Para Mesa</ToggleButton>
                 <ToggleButton value="takeaway">Para Llevar</ToggleButton>
@@ -143,11 +144,11 @@ const Carrito = () => {
               )}
               {error && <FormHelperText error sx={{ mt: 1, fontWeight: 'bold' }}>{error}</FormHelperText>}
 
-              <Divider sx={{ my: 2 }}/>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Resumen del Pedido</Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 1 }}>
+              <Divider sx={{ my: 3 }}/>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Resumen</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 1.5 }}>
                 <Typography variant="h6">Subtotal</Typography>
-                <Typography variant="h6">${subtotal.toFixed(2)}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${subtotal.toFixed(2)}</Typography>
               </Box>
               <Button
                 variant="contained"

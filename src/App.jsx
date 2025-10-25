@@ -5,6 +5,7 @@ import {
   ThemeProvider,
   createTheme,
   Box,
+  Container,
 } from '@mui/material';
 
 import Navbar from './components/Navbar';
@@ -80,7 +81,7 @@ function App() {
       <Router>
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Navbar />
-          <Box component="main" sx={{ flexGrow: 1 }}>
+          <Container component="main" maxWidth={false} disableGutters sx={{ flexGrow: 1 }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} />
@@ -92,7 +93,7 @@ function App() {
               <Route path="/mozo" element={<Mozo />} />
               <Route path="/facturacion" element={<Facturacion />} />
             </Routes>
-          </Box>
+          </Container>
         </Box>
       </Router>
     </ThemeProvider>
