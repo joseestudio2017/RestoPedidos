@@ -1,14 +1,16 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useRole } from '../contexts/RoleContext';
 
 function Navbar() {
-  const { role, setRole } = useRole();
+  const { role, logout } = useRole();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setRole('customer'); // Regresa al rol de cliente/invitado
+    logout();
+    navigate('/ingreso');
   };
 
   if (location.pathname === '/') {
@@ -28,7 +30,20 @@ function Navbar() {
               <Button color="inherit" component={Link} to="/entrega-historial">Historial</Button>
               <Button color="inherit" onClick={handleLogout}>Logout</Button>
             </>
-          ) : (
+          ) : role === 'mozo' ? (
+            <>
+              <Button color="inherit" component={Link} to="/menu">Menú</Button>
+              <Button color="inherit" component={Link} to="/entrega">Entrega</Button>
+              <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            </>
+          ) : role === 'cliente' ? (
+             <>
+              <Button color="inherit" component={Link} to="/menu">Menú</Button>
+              <Button color="inherit" component={Link} to="/carrito">Carrito</Button>
+              <Button color="inherit" component={Link} to="/orden">Mi Orden</Button>
+              <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            </>
+          ) : ( // Guest
             <>
               <Button color="inherit" component={Link} to="/menu">Menú</Button>
               <Button color="inherit" component={Link} to="/carrito">Carrito</Button>

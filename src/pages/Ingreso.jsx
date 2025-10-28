@@ -97,7 +97,7 @@ function Ingreso() {
 
   const options = [
     { name: "Cliente", role: "cliente", path: "/menu", icon: <PeopleIcon /> },
-    { name: "Mozo", role: "mozo", path: "/menu", icon: <PersonIcon /> },
+    { name: "Mozo", role: "mozo", path: "/entrega", icon: <PersonIcon /> },
     { name: "Admin", role: "admin", path: "/menu-abm", icon: <AdminPanelSettingsIcon /> },
   ];
 

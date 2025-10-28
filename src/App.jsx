@@ -18,6 +18,7 @@ import Ingreso from './pages/Ingreso';
 import Orden from './pages/Orden';
 import Facturacion from './pages/Facturacion';
 import MenuABM from './pages/MenuABM';
+import Entrega from './pages/Entrega';
 import EntregaHis from './pages/EntregaHis';
 import AdminRoute from './components/AdminRoute';
 import './App.css';
@@ -81,6 +82,7 @@ function AppContent() {
           <Route path="/ingreso" element={<Ingreso />} />
           <Route path="/orden" element={<Orden />} />
           <Route path="/facturacion" element={<Facturacion />} />
+          <Route path="/entrega" element={<Entrega />} />
           <Route path="/menu-abm" element={<AdminRoute><MenuABM /></AdminRoute>} />
           <Route path="/entrega-historial" element={<AdminRoute><EntregaHis /></AdminRoute>} />
         </Routes>
