@@ -25,7 +25,8 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle'; // Importado
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import HistoryIcon from '@mui/icons-material/History';
 import { useRole } from '../contexts/RoleContext';
 
 export default function Navbar() {
@@ -54,13 +55,14 @@ export default function Navbar() {
       { name: 'Mis Pedidos', icon: <ListAltIcon />, path: '/orders' },
     ],
     mozo: [
-      { name: 'Home', icon: <HomeIcon />, path: '/' },
-      { name: 'Pedidos para Entregar', icon: <FastfoodIcon />, path: '/mozo' },
+      { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
+      { name: 'Entregas', icon: <ListAltIcon />, path: '/entrega' },
     ],
     admin: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
       { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
-      { name: 'TP', icon: <BuildCircleIcon />, path: '/tp' }, // Añadido
+      { name: 'TP', icon: <BuildCircleIcon />, path: '/tp' },
+      { name: 'Historial de Entregas', icon: <HistoryIcon />, path: '/entrega-historial' },
     ],
     default: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },

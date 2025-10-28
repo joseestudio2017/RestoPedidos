@@ -14,11 +14,12 @@ import AdminRoute from './components/AdminRoute'; // Importado
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Carrito from './pages/Carrito';
-import Orders from './pages/Orders';
+import Orden from './pages/Orden';
 import AdminAuth from './pages/AdminAuth';
 import Profile from './pages/Profile';
 import Clientes from './pages/Clientes';
-import Mozo from './pages/Mozo';
+import Entrega from './pages/Entrega';
+import EntregaHistorial from './pages/EntregaHistorial';
 import Facturacion from './pages/Facturacion';
 import TP from './pages/TP'; // Importado
 
@@ -87,15 +88,16 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} />
               <Route path="/carrito" element={<Carrito />} />
-              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders" element={<Orden />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/facturacion" element={<Facturacion />} />
+              <Route path="/entrega" element={<Entrega />} />
 
               {/* Rutas de Admin */}
               <Route path="/admin" element={<AdminAuth />} />
               <Route path="/clientes" element={<AdminRoute><Clientes /></AdminRoute>} />
-              <Route path="/mozo" element={<AdminRoute><Mozo /></AdminRoute>} />
-              <Route path="/facturacion" element={<AdminRoute><Facturacion /></AdminRoute>} />
               <Route path="/tp" element={<AdminRoute><TP /></AdminRoute>} />
+              <Route path="/entrega-historial" element={<AdminRoute><EntregaHistorial /></AdminRoute>} />
             </Routes>
           </Container>
         </Box>

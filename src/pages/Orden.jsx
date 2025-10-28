@@ -26,12 +26,19 @@ import {
 import { Link } from 'react-router-dom';
 
 const getStatusChip = (status) => {
+  const lowerCaseStatus = status ? status.toLowerCase() : '';
   const statusStyles = {
-    pendiente: {
+    pedido: {
       icon: <HourglassTop />,
-      label: 'Pendiente',
-      color: 'info',
-      variant: 'outlined',
+      label: 'Pedido',
+      color: 'error',
+      variant: 'contained',
+    },
+    pendiente: { // Fallback for old status
+      icon: <HourglassTop />,
+      label: 'Pedido',
+      color: 'error',
+      variant: 'contained',
     },
     'en preparacion': {
       icon: <Fastfood />,
@@ -52,12 +59,12 @@ const getStatusChip = (status) => {
     },
   };
 
-  const style = statusStyles[status] || statusStyles.default;
+  const style = statusStyles[lowerCaseStatus] || statusStyles.default;
 
   return <Chip icon={style.icon} label={style.label} color={style.color} variant={style.variant} sx={{ fontWeight: 'bold' }} />;
 };
 
-const Orders = () => {
+const Orden = () => {
   const { orders } = useOrders();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -152,4 +159,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Orden;

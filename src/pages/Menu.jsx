@@ -53,7 +53,7 @@ const Menu = () => {
         }}>
           <CardMedia
             component="img"
-            height={isMobile ? "180" : "220"} // Altura de imagen reducida en móvil
+            height={isMobile ? "180" : "220"}
             image={item.image}
             alt={item.name}
           />
@@ -72,37 +72,39 @@ const Menu = () => {
               />
             </Box>
           </CardContent>
-          <CardActions sx={{ justifyContent: 'center', p: { xs: 1, sm: 2 }, pt: 0 }}>
-            {role ? (
-              cartItem ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%' }}>
-                  <IconButton color="secondary" onClick={() => decreaseFromCart(item.id)} sx={{ p: 1.5 }}>
-                    <RemoveIcon />
-                  </IconButton>
-                  <Typography variant="h6" sx={{ mx: 1 }}>{cartItem.quantity}</Typography>
-                  <IconButton color="secondary" onClick={() => addToCart(item)} sx={{ p: 1.5 }}>
-                    <AddIcon />
-                  </IconButton>
-                </Box>
+          <CardActions sx={{ justifyContent: 'center', p: { xs: 1, sm: 2 }, pt: 0, minHeight: 68 }}>
+            {role !== 'mozo' && (
+              role ? (
+                cartItem ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%' }}>
+                    <IconButton color="secondary" onClick={() => decreaseFromCart(item.id)} sx={{ p: 1.5 }}>
+                      <RemoveIcon />
+                    </IconButton>
+                    <Typography variant="h6" sx={{ mx: 1 }}>{cartItem.quantity}</Typography>
+                    <IconButton color="secondary" onClick={() => addToCart(item)} sx={{ p: 1.5 }}>
+                      <AddIcon />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => addToCart(item)}
+                    sx={{ width: '95%', py: 1.2, fontSize: '0.9rem' }}
+                  >
+                    Añadir al Carrito
+                  </Button>
+                )
               ) : (
                 <Button
                   variant="contained"
-                  color="secondary"
-                  onClick={() => addToCart(item)}
+                  color="primary"
+                  onClick={handleLoginRedirect}
                   sx={{ width: '95%', py: 1.2, fontSize: '0.9rem' }}
                 >
-                  Añadir al Carrito
+                  Ingresar para Pedir
                 </Button>
               )
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleLoginRedirect}
-                sx={{ width: '95%', py: 1.2, fontSize: '0.9rem' }}
-              >
-                Ingresar para Pedir
-              </Button>
             )}
           </CardActions>
         </Card>

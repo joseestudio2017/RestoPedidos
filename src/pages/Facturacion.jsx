@@ -61,7 +61,7 @@ function Facturacion() {
 
   const handlePaymentSuccess = () => {
     if (order) {
-      updateOrderStatus(order.id, 'en preparacion');
+      updateOrderStatus(order.id, 'Pedido');
       setIsPaid(true);
       sessionStorage.removeItem('lastOrder');
     }
@@ -88,7 +88,7 @@ function Facturacion() {
           <CheckCircleOutlineIcon color="success" sx={{ fontSize: { xs: 70, sm: 90 }, mb: 2 }} />
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>¡Pago Confirmado!</Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-            Tu pedido está <Chip label="En Preparación" color="warning" sx={{ fontWeight: 'bold' }} />.
+            Tu pedido está <Chip label="Pedido" color="error" variant="contained" sx={{ fontWeight: 'bold' }} />.
           </Typography>
           <Button onClick={() => navigate('/orders')} variant="contained" size="large">Ver Mis Pedidos</Button>
         </Paper>

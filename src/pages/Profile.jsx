@@ -26,7 +26,7 @@ function Profile() {
 
   const options = [
     { name: "Clientes", role: "cliente", path: "/menu", icon: <PeopleIcon /> },
-    { name: "Mozo", role: "mozo", path: "/mozo", icon: <PersonIcon /> },
+    { name: "Mozo", role: "mozo", path: "/menu", icon: <PersonIcon /> },
     { name: "Admin", role: "admin", path: "/admin", icon: <AdminPanelSettingsIcon /> },
   ];
 

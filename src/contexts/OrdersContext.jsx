@@ -6,7 +6,17 @@ export const OrdersProvider = ({ children }) => {
   const [orders, setOrders] = useState(() => {
     try {
       const savedOrders = localStorage.getItem('orders');
-      return savedOrders ? JSON.parse(savedOrders) : [];
+      if (savedOrders) {
+        const parsedOrders = JSON.parse(savedOrders);
+        // Migration for old statuses
+        return parsedOrders.map(order => {
+          if (order.status && order.status.toLowerCase() === 'pendiente') {
+            return { ...order, status: 'Pedido' };
+          }
+          return order;
+        });
+      }
+      return [];
     } catch (error) {
       console.error("Failed to parse orders from localStorage", error);
       return [];
@@ -22,7 +32,7 @@ export const OrdersProvider = ({ children }) => {
       ...newOrder,
       id: `order_${Date.now()}`,
       timestamp: new Date(),
-      status: 'Pendiente', // Initial status is Pendiente
+      status: 'Pedido', // Initial status is Pedido
     };
     setOrders((prevOrders) => [...prevOrders, orderWithDetails]);
     // Return the newly created order so we can use it right away
