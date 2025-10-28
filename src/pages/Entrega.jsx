@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useOrders } from '../contexts/OrdersContext';
 import {
-  Container,
   Typography,
   Paper,
   Grid,
@@ -13,8 +12,24 @@ import {
   useMediaQuery,
   FormControlLabel,
   Checkbox,
+  styled
 } from '@mui/material';
-import { Fastfood, Restaurant, CheckCircle } from '@mui/icons-material';
+import {
+    Fastfood,
+    Restaurant,
+    CheckCircle,
+    DeliveryDining as DeliveryDiningIcon
+} from '@mui/icons-material';
+import PageLayout from '../components/PageLayout';
+
+const GlassmorphicPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    boxShadow: theme.shadows[8],
+    borderRadius: '16px',
+    color: 'white',
+}));
 
 const Entrega = () => {
   const { orders, updateOrderStatus } = useOrders();
@@ -23,10 +38,11 @@ const Entrega = () => {
   const [showDelivered, setShowDelivered] = useState(false);
 
   const filteredOrders = useMemo(() => {
+    const sortedOrders = orders.slice().sort((a, b) => a.timestamp - b.timestamp);
     if (showDelivered) {
-      return orders;
+      return sortedOrders;
     }
-    return orders.filter(order => order.status.toLowerCase() !== 'entregado');
+    return sortedOrders.filter(order => order.status.toLowerCase() !== 'entregado');
   }, [orders, showDelivered]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
@@ -42,11 +58,11 @@ const Entrega = () => {
     switch (lowerCaseStatus) {
       case 'pedido':
       case 'pendiente':
-        return <Chip label="Pedido" color="error" />;
+        return <Chip label="Pedido" color="error" variant="filled" sx={{fontWeight: 'bold'}}/>;
       case 'en preparacion':
-        return <Chip label="En Preparación" color="warning" />;
+        return <Chip label="En Preparación" color="warning" variant="filled" sx={{fontWeight: 'bold'}}/>;
       case 'entregado':
-        return <Chip label="Entregado" color="success" />;
+        return <Chip label="Entregado" color="success" variant="filled" sx={{fontWeight: 'bold'}}/>;
       default:
         return <Chip label={status} />;
     }
@@ -62,7 +78,7 @@ const Entrega = () => {
               Pedido para Llevar
             </Typography>
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mt: 1 }}>
             Cliente: {order.customerName} ({order.takeAwayNumber})
           </Typography>
         </Box>
@@ -77,7 +93,7 @@ const Entrega = () => {
               Comer en el Lugar
             </Typography>
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mt: 1 }}>
             Mesa seleccionada: {order.tableNumber}
           </Typography>
         </Box>
@@ -87,70 +103,71 @@ const Entrega = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
-      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: 3, fontWeight: 800 }}>
-        Panel de Entregas
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-        <FormControlLabel
-          control={<Checkbox checked={showDelivered} onChange={handleShowDeliveredChange} />}
-          label="Mostrar pedidos entregados"
-        />
-      </Box>
-      {filteredOrders.length > 0 ? (
-        <Grid container spacing={isMobile ? 2 : 3}>
-          {filteredOrders.map((order) => {
-            const orderStatus = order.status ? order.status.toLowerCase() : '';
-            return (
-              <Grid item xs={12} sm={6} md={4} key={order.id}>
-                <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2 }}>
-                  {renderOrderHeader(order)}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
-                    {getOrderStatusChip(order.status)}
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
-                  </Box>
-                  <Divider sx={{ my: 1 }} />
-                  <Box sx={{ flexGrow: 1, my: 2, maxHeight: 150, overflowY: 'auto' }}>
-                    {order.items.map((item) => (
-                      <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography>{item.name}</Typography>
-                        <Typography>x{item.quantity}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Divider sx={{ my: 1 }} />
-                  <Box sx={{ mt: 'auto', height: 50 }}>
-                    {(orderStatus === 'pedido' || orderStatus === 'pendiente') && (
-                      <Button
-                        variant="contained"
-                        color="warning"
-                        fullWidth
-                        onClick={() => handleUpdateStatus(order.id, 'en preparacion')}
-                      >
-                        En Preparación
-                      </Button>
-                    )}
-                    {orderStatus === 'en preparacion' && (
-                      <Button
-                        variant="contained"
-                        color="success"
-                        fullWidth
-                        onClick={() => handleUpdateStatus(order.id, 'entregado')}
-                        startIcon={<CheckCircle />}
-                      >
-                        Entregar
-                      </Button>
-                    )}
-                  </Box>
-                </Paper>
-              </Grid>
-            );
-          })}
-        </Grid>
-      ) : (
-        <Typography variant="h5" align="center" color="text.secondary">No hay pedidos para mostrar.</Typography>
-      )}
-    </Container>
+    <PageLayout title="Panel de Entregas" icon={DeliveryDiningIcon}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+            <GlassmorphicPaper sx={{p: 1, px: 2}}>
+                <FormControlLabel
+                    control={<Checkbox checked={showDelivered} onChange={handleShowDeliveredChange} sx={{ color: 'rgba(255,255,255,0.8)', '&.Mui-checked': { color: 'secondary.main' } }} />}
+                    label="Mostrar pedidos entregados"
+                />
+            </GlassmorphicPaper>
+        </Box>
+        {filteredOrders.length > 0 ? (
+            <Grid container spacing={isMobile ? 2 : 3}>
+            {filteredOrders.map((order) => {
+                const orderStatus = order.status ? order.status.toLowerCase() : '';
+                return (
+                <Grid item xs={12} sm={6} md={4} key={order.id}>
+                    <GlassmorphicPaper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        {renderOrderHeader(order)}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
+                            {getOrderStatusChip(order.status)}
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
+                        </Box>
+                        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.2)' }} />
+                        <Box sx={{ flexGrow: 1, my: 2, maxHeight: 150, overflowY: 'auto' }}>
+                            {order.items.map((item) => (
+                            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography>{item.name}</Typography>
+                                <Typography>x{item.quantity}</Typography>
+                            </Box>
+                            ))}
+                        </Box>
+                        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.2)' }} />
+                        <Box sx={{ mt: 'auto', height: 50 }}>
+                            {(orderStatus === 'pedido' || orderStatus === 'pendiente') && (
+                            <Button
+                                variant="contained"
+                                color="warning"
+                                fullWidth
+                                onClick={() => handleUpdateStatus(order.id, 'en preparacion')}
+                            >
+                                En Preparación
+                            </Button>
+                            )}
+                            {orderStatus === 'en preparacion' && (
+                            <Button
+                                variant="contained"
+                                color="success"
+                                fullWidth
+                                onClick={() => handleUpdateStatus(order.id, 'entregado')}
+                                startIcon={<CheckCircle />}
+                            >
+                                Entregar
+                            </Button>
+                            )}
+                        </Box>
+                    </GlassmorphicPaper>
+                </Grid>
+                );
+            })}
+            </Grid>
+        ) : (
+            <GlassmorphicPaper sx={{textAlign: 'center', py: 6}}>
+                <Typography variant="h5" align="center">No hay pedidos para mostrar.</Typography>
+            </GlassmorphicPaper>
+        )}
+    </PageLayout>
   );
 };
 

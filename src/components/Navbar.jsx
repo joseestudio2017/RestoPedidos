@@ -22,11 +22,11 @@ import FastfoodIcon from '@mui/icons-material/Fastfood';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import HistoryIcon from '@mui/icons-material/History';
+import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
 import { useRole } from '../contexts/RoleContext';
 
 export default function Navbar() {
@@ -38,7 +38,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/profile');
+    navigate('/ingreso');
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -56,17 +56,16 @@ export default function Navbar() {
     ],
     mozo: [
       { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
-      { name: 'Entregas', icon: <ListAltIcon />, path: '/entrega' },
+      { name: 'Entregas', icon: <DeliveryDiningIcon />, path: '/entrega' },
     ],
     admin: [
       { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
-      { name: 'TP', icon: <BuildCircleIcon />, path: '/tp' },
-      { name: 'Historial de Entregas', icon: <HistoryIcon />, path: '/entrega-historial' },
-      { name: 'Ingreso', icon: <AccountCircleIcon />, path: '/profile' },
+      { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+      { name: 'Historial', icon: <HistoryIcon />, path: '/entrega-his' },
     ],
     default: [
-      { name: 'Home', icon: <HomeIcon />, path: '/' },
-      { name: 'Perfil', icon: <AccountCircleIcon />, path: '/profile' },
+      { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
+      { name: 'Ingreso', icon: <AccountCircleIcon />, path: '/ingreso' },
     ]
   };
 
@@ -74,37 +73,45 @@ export default function Navbar() {
 
   const drawerList = () => (
     <Box
-      sx={{ width: 270, display: 'flex', flexDirection: 'column', height: '100%' }}
+      sx={{
+        width: 270,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        background: 'rgba(30, 30, 30, 0.8)',
+        backdropFilter: 'blur(15px)',
+        color: 'white'
+      }}
       role="presentation"
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
-      <Box sx={{ p: 2, textAlign: 'center', backgroundColor: 'primary.main', color: 'white' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>RestoPedidos</Typography>
-      </Box>
-      <List sx={{ flexGrow: 1 }}>
-        {navItems.map((item) => (
-          <ListItem key={item.name} disablePadding>
-            <ListItemButton component={Link} to={item.path}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      {role && (
-        <>
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton onClick={handleLogout}>
-                <ListItemIcon><LogoutIcon /></ListItemIcon>
-                <ListItemText primary="Cerrar Sesión" />
-              </ListItemButton>
+        <Box sx={{ p: 2, textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>RestoPedidos</Typography>
+        </Box>
+        <List sx={{ flexGrow: 1 }}>
+            {navItems.map((item) => (
+            <ListItem key={item.name} disablePadding>
+                <ListItemButton component={Link} to={item.path} sx={{ '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
+                <ListItemIcon sx={{color: 'white'}}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.name} />
+                </ListItemButton>
             </ListItem>
-          </List>
-        </>
-      )}
+            ))}
+        </List>
+        {role && (
+            <>
+            <Divider sx={{borderColor: 'rgba(255,255,255,0.1)'}}/>
+            <List>
+                <ListItem disablePadding>
+                <ListItemButton onClick={handleLogout} sx={{ '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
+                    <ListItemIcon sx={{color: 'white'}}><LogoutIcon /></ListItemIcon>
+                    <ListItemText primary="Cerrar Sesión" />
+                </ListItemButton>
+                </ListItem>
+            </List>
+            </>
+        )}
     </Box>
   );
 
@@ -114,17 +121,23 @@ export default function Navbar() {
     fontSize: '1rem',
     color: 'white',
     borderRadius: '8px',
-    transition: theme.transitions.create(['background-color', 'transform'], { 
+    transition: theme.transitions.create(['background-color', 'transform', 'box-shadow'], { 
         duration: theme.transitions.duration.short 
     }),
     '&:hover': {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        transform: 'scale(1.05)'
+        transform: 'scale(1.05)',
+        boxShadow: `0 0 15px 2px ${theme.palette.secondary.main}77`
     },
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: 'primary.main', boxShadow: theme.shadows[2] }}>
+    <AppBar position="sticky" sx={{
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: 'none',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)' 
+    }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Button 
           color="inherit" 
@@ -141,8 +154,9 @@ export default function Navbar() {
             }
           }}
         >
-          <FastfoodIcon sx={{ mr: 1, color: 'secondary.main' }} />
-          <Box component="span" sx={{ color: 'secondary.main' }}>Resto</Box>Pedidos
+          <FastfoodIcon sx={{ mr: 1, color: 'primary.main' }} />
+          <Box component="span" sx={{ color: 'white' }}>Resto</Box>
+          <Box component="span" sx={{ color: 'primary.main' }}>Pedidos</Box>
         </Button>
 
         {isMobile ? (
@@ -181,6 +195,7 @@ export default function Navbar() {
         anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
+        PaperProps={{ sx: { background: 'transparent' } }}
       >
         {drawerList()}
       </Drawer>

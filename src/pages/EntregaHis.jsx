@@ -1,14 +1,42 @@
 import React from 'react';
 import { useOrders } from '../contexts/OrdersContext';
-import { Container, Typography, Paper, Grid, Box, Chip, Divider, useTheme, useMediaQuery } from '@mui/material';
-import { Fastfood, Restaurant } from '@mui/icons-material';
+import {
+  Typography,
+  Paper,
+  Grid,
+  Box,
+  Chip,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  styled
+} from '@mui/material';
+import {
+    Fastfood,
+    Restaurant,
+    History as HistoryIcon
+} from '@mui/icons-material';
+import PageLayout from '../components/PageLayout';
+
+const GlassmorphicPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    boxShadow: theme.shadows[8],
+    borderRadius: '16px',
+    color: 'white',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: theme.spacing(2),
+}));
 
 const EntregaHis = () => {
   const { orders } = useOrders();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const deliveredOrders = orders.filter(order => order.status === 'entregado');
+  const deliveredOrders = orders.filter(order => order.status.toLowerCase() === 'entregado');
 
   const renderOrderHeader = (order) => {
     if (order.orderType === 'takeaway') {
@@ -20,7 +48,7 @@ const EntregaHis = () => {
               Pedido para Llevar
             </Typography>
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mt: 1 }}>
             Cliente: {order.customerName} ({order.takeAwayNumber})
           </Typography>
         </Box>
@@ -35,7 +63,7 @@ const EntregaHis = () => {
               Comer en el Lugar
             </Typography>
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mt: 1 }}>
             Mesa seleccionada: {order.tableNumber}
           </Typography>
         </Box>
@@ -45,21 +73,18 @@ const EntregaHis = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: isMobile ? 2 : 4 }}>
-      <Typography variant={isMobile ? 'h3' : 'h2'} component="h1" gutterBottom align="center" sx={{ mb: isMobile ? 3 : 6, fontWeight: 800 }}>
-        Historial de Entregas
-      </Typography>
+    <PageLayout title="Historial de Entregas" icon={HistoryIcon}>
       {deliveredOrders.length > 0 ? (
         <Grid container spacing={isMobile ? 2 : 3}>
           {deliveredOrders.map((order) => (
             <Grid item xs={12} sm={6} md={4} key={order.id}>
-              <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 2 }}>
+              <GlassmorphicPaper>
                 {renderOrderHeader(order)}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
-                  <Chip label="Entregado" color="success" />
+                  <Chip label="Entregado" color="success" variant='filled' sx={{fontWeight: 'bold'}}/>
                   <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
                 </Box>
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.2)' }} />
                 <Box sx={{ flexGrow: 1, my: 2, maxHeight: 150, overflowY: 'auto' }}>
                   {order.items.map((item) => (
                     <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -68,14 +93,16 @@ const EntregaHis = () => {
                     </Box>
                   ))}
                 </Box>
-              </Paper>
+              </GlassmorphicPaper>
             </Grid>
           ))}
         </Grid>
       ) : (
-        <Typography variant="h5" align="center" color="text.secondary">No hay pedidos entregados para mostrar.</Typography>
+        <GlassmorphicPaper sx={{textAlign: 'center', p: 4}}>
+            <Typography variant="h5" align="center">No hay pedidos entregados en el historial.</Typography>
+        </GlassmorphicPaper>
       )}
-    </Container>
+    </PageLayout>
   );
 };
 

@@ -7,8 +7,34 @@ import {
   Typography,
   CircularProgress,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  styled
 } from '@mui/material';
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& label.Mui-focused': {
+        color: theme.palette.secondary.main,
+    },
+    '& .MuiInputLabel-root': {
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    '& .MuiOutlinedInput-root': {
+        color: 'white',
+        '& fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+        },
+        '&:hover fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.7)',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.secondary.main,
+            boxShadow: `0 0 5px ${theme.palette.secondary.main}`
+        },
+    },
+    '& .MuiFormHelperText-root': {
+        color: theme.palette.error.light,
+    }
+}));
 
 function CreditCardForm({ onPaymentSuccess, orderTotal }) {
   const [cardData, setCardData] = useState({
@@ -23,7 +49,18 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'number' || name === 'cvc') {
+        value = value.replace(/[^0-9]/g, '');
+    } else if (name === 'expiry') {
+        value = value.replace(/[^0-9/]/g, '');
+        if (value.length === 2 && cardData.expiry.length === 1 && value.includes('/') === false) {
+            value = value + '/';
+        }
+        if (value.length > 5) {
+            value = value.substring(0, 5);
+        }
+    }
     setCardData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -31,7 +68,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
       const newErrors = {};
       if (!cardData.name) newErrors.name = 'El nombre es obligatorio';
       if (!cardData.number.match(/^[0-9]{16}$/)) newErrors.number = 'Debe tener 16 dígitos';
-      if (!cardData.expiry.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) newErrors.expiry = 'Formato MM/AA incorrecto';
+      if (!cardData.expiry.match(/^(0[1-9]|1[0-2])\/([2-9]{1}[0-9]{1})$/)) newErrors.expiry = 'Formato MM/AA inválido';
       if (!cardData.cvc.match(/^[0-9]{3,4}$/)) newErrors.cvc = 'Debe tener 3 o 4 dígitos';
       
       setErrors(newErrors);
@@ -53,10 +90,10 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ px: isMobile ? 1 : 0 }}>
-      <Typography variant="h6" gutterBottom>Datos de la Tarjeta</Typography>
+      <Typography variant="h6" gutterBottom sx={{ color: 'white', fontWeight: 'bold'}}>Datos de la Tarjeta</Typography>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <TextField
+          <StyledTextField
             required
             fullWidth
             label="Número de la Tarjeta"
@@ -69,7 +106,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField
+          <StyledTextField
             required
             fullWidth
             label="Nombre en la Tarjeta"
@@ -81,7 +118,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
           />
         </Grid>
         <Grid item xs={6}>
-          <TextField
+          <StyledTextField
             required
             fullWidth
             label="Vencimiento"
@@ -94,7 +131,7 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
           />
         </Grid>
         <Grid item xs={6}>
-          <TextField
+          <StyledTextField
             required
             fullWidth
             type="password"
@@ -114,7 +151,12 @@ function CreditCardForm({ onPaymentSuccess, orderTotal }) {
                 color="success" 
                 fullWidth 
                 size="large" 
-                sx={{ mt: 2, py: 1.5, fontSize: isMobile ? '1rem' : '1.2rem' }}
+                sx={{ 
+                    mt: 2, py: 1.5, 
+                    fontSize: isMobile ? '1rem' : '1.2rem', 
+                    fontWeight: 'bold',
+                    boxShadow: `0 0 15px 2px ${theme.palette.success.main}`
+                }}
                 disabled={isProcessing}
              >
                 {isProcessing ? <CircularProgress size={26} color="inherit" /> : `Pagar $${orderTotal.toFixed(2)}`}
