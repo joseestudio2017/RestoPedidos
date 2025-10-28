@@ -34,6 +34,7 @@ Este documento describe la estructura, características y plan de desarrollo par
 *   **Contexto Global:** La aplicación utiliza React Context para gestionar el estado del menú, el carrito y los pedidos de forma centralizada y eficiente.
 *   **Carrusel con Scroll Snapping:** En la vista móvil, el menú utiliza un carrusel con efecto de "enganche" (scroll snapping), que centra una tarjeta a la vez para mejorar la visibilidad y la interacción con cada producto.
 *   **Acceso Condicional:** El menú muestra dinámicamente opciones para 'Añadir al Carrito' o 'Ingresar como Cliente' dependiendo de si el usuario ha seleccionado un perfil, guiando a los visitantes a iniciar sesión.
+*   **Navegación Personalizada por Rol:** La barra de navegación se adapta al rol del usuario. Para el **Administrador**, se ha simplificado para mostrar solo los enlaces relevantes a su función: "Menu", "TP" (Terminal de Pedidos), "Historial de Entregas" e "Ingreso", eliminando vistas innecesarias como "Home" para una experiencia más enfocada.
 
 ## Plan de Desarrollo
 

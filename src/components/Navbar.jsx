@@ -59,10 +59,10 @@ export default function Navbar() {
       { name: 'Entregas', icon: <ListAltIcon />, path: '/entrega' },
     ],
     admin: [
-      { name: 'Home', icon: <HomeIcon />, path: '/' },
-      { name: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
+      { name: 'Menu', icon: <FastfoodIcon />, path: '/menu' },
       { name: 'TP', icon: <BuildCircleIcon />, path: '/tp' },
       { name: 'Historial de Entregas', icon: <HistoryIcon />, path: '/entrega-historial' },
+      { name: 'Ingreso', icon: <AccountCircleIcon />, path: '/profile' },
     ],
     default: [
       { name: 'Home', icon: <HomeIcon />, path: '/' },
