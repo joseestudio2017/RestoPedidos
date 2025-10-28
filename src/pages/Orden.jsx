@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useOrders } from '../contexts/OrdersContext';
 import { useRole } from '../contexts/RoleContext';
 import {
-  Typography, Box, Grid, Paper, Select, MenuItem, Chip, CircularProgress, useTheme, styled
+  Typography, Box, Grid, Paper, Select, MenuItem, Chip, CircularProgress, styled, CardMedia
 } from '@mui/material';
 import { Restore, Kitchen } from '@mui/icons-material';
 import PageLayout from '../components/PageLayout';
 
-// Styled component for the card to maintain the glassmorphic effect
 const GlassmorphicCard = styled(Paper)(({ theme }) => ({
-  p: 2.5,
+  padding: theme.spacing(2.5),
   borderRadius: '16px',
   backgroundColor: 'rgba(0,0,0,0.4)',
   backdropFilter: 'blur(10px)',
@@ -20,7 +19,6 @@ const GlassmorphicCard = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
 }));
 
-// Function to determine chip color based on order status
 const getChipColor = (status) => {
   switch (status) {
     case 'Procesando Pago': return 'secondary';
@@ -41,18 +39,28 @@ const Orden = () => {
 
   useEffect(() => {
     if (orders) {
-      // Sort orders by creation date, newest first
-      const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      let ordersToDisplay = [...orders];
+
+      // For customers, only show active orders (not 'Entregado')
+      if (role === 'cliente') {
+        ordersToDisplay = ordersToDisplay.filter(
+          (order) => order.status !== 'Entregado'
+        );
+      }
+
+      const sortedOrders = ordersToDisplay.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
       setDisplayOrders(sortedOrders);
       setLoading(false);
     }
-  }, [orders]);
+  }, [orders, role]);
 
   const handleStatusChange = (orderId, newStatus) => {
     updateOrderStatus(orderId, newStatus);
   };
 
-  // Reusable function to render each order card
   const renderOrderCard = (order) => (
     <Grid item xs={12} md={6} lg={4} key={order.id}>
       <GlassmorphicCard elevation={4}>
@@ -60,7 +68,7 @@ const Orden = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
              {order.orderType === 'table' ? `Mesa #${order.tableNumber}` : (order.customerName || `Pedido #${order.id.split('-')[1]}`)}
           </Typography>
-          <Chip 
+          <Chip
             label={order.status || 'N/A'}
             color={getChipColor(order.status)}
             size="small"
@@ -69,9 +77,18 @@ const Orden = () => {
         </Box>
         <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'secondary.main' }}>
           {order.items.map(item => (
-            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
-              <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
-              <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
+            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', py: 1.5, pl: 1.5 }}>
+              <CardMedia
+                component="img"
+                sx={{ width: 60, height: 60, borderRadius: '8px', mr: 2 }}
+                image={item.imageUrl || 'https://via.placeholder.com/150'}
+                alt={item.name}
+              />
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>{item.description}</Typography>
+              </Box>
+              <Typography sx={{ fontWeight: 'medium', ml: 1 }}>${(item.price * item.quantity).toFixed(2)}</Typography>
             </Box>
           ))}
         </Box>
@@ -79,15 +96,14 @@ const Orden = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
         </Box>
-        {/* Dropdown for status change, visible only to admin/staff */}
         {(role === 'admin' || role === 'mozo') && (
           <Select
             value={order.status}
             onChange={(e) => handleStatusChange(order.id, e.target.value)}
             fullWidth
-            sx={{ 
-              mt: 2, 
-              color: 'white', 
+            sx={{
+              mt: 2,
+              color: 'white',
               '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' },
               '& .MuiSvgIcon-root': { color: 'white' },
               borderRadius: '8px',
@@ -106,8 +122,8 @@ const Orden = () => {
   );
 
   return (
-    <PageLayout 
-      title={role === 'admin' || role === 'mozo' ? "Panel de Órdenes" : "Mis Pedidos"} 
+    <PageLayout
+      title={role === 'admin' || role === 'mozo' ? "Panel de Órdenes" : "Mis Pedidos Activos"}
       icon={role === 'admin' || role === 'mozo' ? Kitchen : Restore}
     >
       {loading ? (
@@ -116,7 +132,16 @@ const Orden = () => {
         <Grid container spacing={3}>{displayOrders.map(renderOrderCard)}</Grid>
       ) : (
         <GlassmorphicCard sx={{textAlign: 'center', p: 5}}>
-          <Typography variant="h5">Aún no has realizado ningún pedido.</Typography>
+           <Typography variant="h5">
+            {role === 'cliente'
+              ? 'No tienes pedidos activos en este momento.'
+              : 'No hay órdenes para mostrar.'}
+          </Typography>
+          {role === 'cliente' && (
+             <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.7)'}}>
+              Revisa la sección "Historial" para ver tus pedidos completados.
+            </Typography>
+          )}
         </GlassmorphicCard>
       )}
     </PageLayout>

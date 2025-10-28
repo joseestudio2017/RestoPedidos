@@ -16,6 +16,7 @@ import Menu from './pages/Menu';
 import Carrito from './pages/Carrito';
 import Ingreso from './pages/Ingreso';
 import Orden from './pages/Orden';
+import OrdenHis from './pages/OrdenHis';
 import Facturacion from './pages/Facturacion';
 import MenuABM from './pages/MenuABM';
 import Entrega from './pages/Entrega';
@@ -81,6 +82,7 @@ function AppContent() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/ingreso" element={<Ingreso />} />
           <Route path="/orden" element={<Orden />} />
+          <Route path="/historial" element={<OrdenHis />} />
           <Route path="/facturacion" element={<Facturacion />} />
           <Route path="/entrega" element={<Entrega />} />
           <Route path="/menu-abm" element={<AdminRoute><MenuABM /></AdminRoute>} />
