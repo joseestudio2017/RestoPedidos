@@ -2,83 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { useOrders } from '../contexts/OrdersContext';
 import { useRole } from '../contexts/RoleContext';
 import {
-  Typography, Box, Grid, Paper, Select, MenuItem, Chip, Tabs, Tab, useTheme, CircularProgress, IconButton
+  Typography, Box, Grid, Paper, Select, MenuItem, Chip, CircularProgress, useTheme, styled
 } from '@mui/material';
-import { CheckCircleOutline, Kitchen, DeliveryDining, Restore } from '@mui/icons-material';
+import { Restore, Kitchen } from '@mui/icons-material';
 import PageLayout from '../components/PageLayout';
 
-const TABS = ['Pendiente', 'En Preparación', 'Listo', 'Entregado'];
+// Styled component for the card to maintain the glassmorphic effect
+const GlassmorphicCard = styled(Paper)(({ theme }) => ({
+  p: 2.5,
+  borderRadius: '16px',
+  backgroundColor: 'rgba(0,0,0,0.4)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  color: 'white',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+}));
 
+// Function to determine chip color based on order status
 const getChipColor = (status) => {
   switch (status) {
+    case 'Procesando Pago': return 'secondary';
     case 'Pendiente': return 'warning';
     case 'En Preparación': return 'info';
     case 'Listo': return 'success';
     case 'Entregado': return 'default';
+    case 'Cancelado': return 'error';
     default: return 'default';
   }
 };
 
-const getStatusText = (status) => status || 'N/A';
-
 const Orden = () => {
-  const { orders, loading, updateOrderStatus } = useOrders();
+  const { orders, updateOrderStatus } = useOrders();
   const { role } = useRole();
-  const theme = useTheme();
-  const [currentTab, setCurrentTab] = useState(0);
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [displayOrders, setDisplayOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const statusToFilter = TABS[currentTab];
-    let filtered = [];
-    if (statusToFilter) {
-        filtered = orders.filter(order => order.status === statusToFilter);
+    if (orders) {
+      // Sort orders by creation date, newest first
+      const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setDisplayOrders(sortedOrders);
+      setLoading(false);
     }
-    
-    filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    setFilteredOrders(filtered);
-}, [orders, currentTab]);
-
+  }, [orders]);
 
   const handleStatusChange = (orderId, newStatus) => {
     updateOrderStatus(orderId, newStatus);
   };
 
-  const handleTabChange = (event, newValue) => {
-    setCurrentTab(newValue);
-  };
-
+  // Reusable function to render each order card
   const renderOrderCard = (order) => (
-    <Grid item xs={12} sm={6} md={4} key={order.id}>
-      <Paper 
-        elevation={4} 
-        sx={{
-          p: 2.5,
-          borderRadius: '16px',
-          backgroundColor: 'rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          color: 'white',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+    <Grid item xs={12} md={6} lg={4} key={order.id}>
+      <GlassmorphicCard elevation={4}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            {order.orderType === 'table' ? `Mesa #${order.tableNumber}` : order.customerName}
+             {order.orderType === 'table' ? `Mesa #${order.tableNumber}` : (order.customerName || `Pedido #${order.id.split('-')[1]}`)}
           </Typography>
           <Chip 
-            label={getStatusText(order.status)}
+            label={order.status || 'N/A'}
             color={getChipColor(order.status)}
             size="small"
             sx={{ fontWeight: 'bold' }}
           />
         </Box>
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'secondary.main' }}>
           {order.items.map(item => (
-            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
-              <Typography>{item.name} (x{item.quantity})</Typography>
+            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
+              <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
               <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
             </Box>
           ))}
@@ -87,66 +79,46 @@ const Orden = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
         </Box>
+        {/* Dropdown for status change, visible only to admin/staff */}
         {(role === 'admin' || role === 'mozo') && (
           <Select
             value={order.status}
             onChange={(e) => handleStatusChange(order.id, e.target.value)}
             fullWidth
-            sx={{ mt: 2, color: 'white', 
+            sx={{ 
+              mt: 2, 
+              color: 'white', 
               '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' },
               '& .MuiSvgIcon-root': { color: 'white' },
               borderRadius: '8px',
+              backgroundColor: 'rgba(255,255,255,0.05)'
             }}
           >
             <MenuItem value="Pendiente">Pendiente</MenuItem>
             <MenuItem value="En Preparación">En Preparación</MenuItem>
             <MenuItem value="Listo">Listo</MenuItem>
             <MenuItem value="Entregado">Entregado</MenuItem>
+             <MenuItem value="Cancelado">Cancelado</MenuItem>
           </Select>
         )}
-      </Paper>
+      </GlassmorphicCard>
     </Grid>
   );
 
   return (
-    <PageLayout title="Panel de Órdenes" icon={Kitchen}>
-        <Paper sx={{
-            width: '100%',
-            mb: { xs: 3, md: 4 },
-            borderRadius: '12px',
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-        }}>
-            <Tabs
-                value={currentTab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="tabs de estado de órdenes"
-                indicatorColor="secondary"
-                textColor="inherit"
-                sx={theme => ({
-                    "& .MuiTab-root": {
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        fontWeight: 'bold',
-                        fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                    },
-                    "& .Mui-selected": {
-                        color: `${theme.palette.secondary.main} !important`,
-                    },
-                })}
-            >
-            {TABS.map((tab, index) => (
-                <Tab label={tab} key={index} />
-            ))}
-            </Tabs>
-        </Paper>
-
-        {loading ? 
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress color="secondary" /></Box> : 
-            <Grid container spacing={3}>{filteredOrders.map(renderOrderCard)}</Grid>
-        }
+    <PageLayout 
+      title={role === 'admin' || role === 'mozo' ? "Panel de Órdenes" : "Mis Pedidos"} 
+      icon={role === 'admin' || role === 'mozo' ? Kitchen : Restore}
+    >
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress color="secondary" /></Box>
+      ) : displayOrders.length > 0 ? (
+        <Grid container spacing={3}>{displayOrders.map(renderOrderCard)}</Grid>
+      ) : (
+        <GlassmorphicCard sx={{textAlign: 'center', p: 5}}>
+          <Typography variant="h5">Aún no has realizado ningún pedido.</Typography>
+        </GlassmorphicCard>
+      )}
     </PageLayout>
   );
 };

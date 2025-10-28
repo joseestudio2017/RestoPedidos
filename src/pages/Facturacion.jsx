@@ -72,7 +72,7 @@ function Facturacion() {
   const { updateOrderStatus } = useOrders();
   const qrCanvasRef = useRef(null);
   const theme = useTheme();
-  
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('card');
@@ -80,21 +80,28 @@ function Facturacion() {
 
   useEffect(() => {
     let orderData = location.state?.order;
+
+    // If no order in state, try sessionStorage
     if (!orderData) {
       const savedOrder = sessionStorage.getItem('lastOrder');
-      try {
-        orderData = savedOrder ? JSON.parse(savedOrder) : null;
-      } catch (error) {
-        console.error("Error parsing saved order:", error);
-        orderData = null;
+      if (savedOrder) {
+        try {
+          orderData = JSON.parse(savedOrder);
+        } catch (error) {
+          console.error("Error parsing saved order:", error);
+          orderData = null;
+        }
       }
     }
+
     if (orderData) {
-        setOrder(orderData);
-        sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+      setOrder(orderData);
+      // Save to sessionStorage to persist across refreshes
+      sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
     }
+
     setLoading(false);
-  }, [location.state?.order]);
+  }, [location.state?.order]); // Rerun only if navigation state changes
 
   useEffect(() => {
     if (order && qrCanvasRef.current && paymentMethod === 'qr') {

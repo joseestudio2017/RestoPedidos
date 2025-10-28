@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useOrders } from '../contexts/OrdersContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Typography, Box, Grid, Card, CardContent, CardMedia,
   Button, IconButton, TextField, Paper, Divider, ToggleButtonGroup, ToggleButton,
@@ -197,7 +197,7 @@ const Carrito = () => {
       {cartItems.length === 0 ? (
         <GlassmorphicPaper elevation={3} sx={{ textAlign: 'center', py: 8, px: 3 }}>
           <Typography variant="h5">Tu carrito está vacío.</Typography>
-          <Button component="a" href="/menu" variant="contained" color="secondary" sx={{ mt: 3, fontWeight: 'bold' }}>Ir al Menú</Button>
+          <Button component={Link} to="/menu" variant="contained" color="secondary" sx={{ mt: 3, fontWeight: 'bold' }}>Ir al Menú</Button>
         </GlassmorphicPaper>
       ) : isMobile ? (
         // =========== MOBILE LAYOUT ===========

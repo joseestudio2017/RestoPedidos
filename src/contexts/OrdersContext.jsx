@@ -34,14 +34,27 @@ const mockOrders = [
 export const OrdersProvider = ({ children }) => {
   const [orders, setOrders] = useState(mockOrders);
 
-  const addOrder = (newOrder) => {
-    // Lógica para añadir un nuevo pedido, incluyendo un ID único
-    const orderWithId = { ...newOrder, id: `ORDER-${String(Date.now()).slice(-5)}` };
-    setOrders(prevOrders => [...prevOrders, orderWithId]);
+  const addOrder = (orderPayload) => {
+    const newOrder = { 
+      ...orderPayload, 
+      id: `ORDER-${String(Date.now()).slice(-5)}`,
+      status: 'Procesando Pago',
+      createdAt: new Date().toISOString(),
+    };
+    setOrders(prevOrders => [...prevOrders, newOrder]);
+    return newOrder; // ¡Devolver el nuevo pedido!
+  };
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders(currentOrders =>
+      currentOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
   };
 
   return (
-    <OrdersContext.Provider value={{ orders, addOrder }}>
+    <OrdersContext.Provider value={{ orders, addOrder, updateOrderStatus }}>
       {children}
     </OrdersContext.Provider>
   );

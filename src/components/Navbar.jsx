@@ -46,8 +46,6 @@ function Navbar() {
           ) : ( // Guest
             <>
               <Button color="inherit" component={Link} to="/menu">Menú</Button>
-              <Button color="inherit" component={Link} to="/carrito">Carrito</Button>
-              <Button color="inherit" component={Link} to="/orden">Mi Orden</Button>
               <Button color="inherit" component={Link} to="/ingreso">Login</Button>
             </>
           )}
