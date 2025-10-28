@@ -23,18 +23,26 @@ const GlassmorphicCard = styled(Paper)(({ theme }) => ({
   height: '100%',
 }));
 
+const getChipColor = (status) => {
+    switch (status) {
+      case 'Entregado': return 'default';
+      case 'Cancelado': return 'error';
+      default: return 'default';
+    }
+  };
+
 const OrdenHis = () => {
   const { orders } = useOrders();
-  const [deliveredOrders, setDeliveredOrders] = useState([]);
+  const [historyOrders, setHistoryOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (orders) {
-      // Filter orders to show only those with "Entregado" status
-      const filtered = orders.filter(order => order.status === 'Entregado');
+      // Filter orders to show only those with "Entregado" or "Cancelado" status
+      const filtered = orders.filter(order => order.status === 'Entregado' || order.status === 'Cancelado');
       // Sort the filtered orders by creation date, newest first
       const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setDeliveredOrders(sorted);
+      setHistoryOrders(sorted);
       setLoading(false);
     }
   }, [orders]);
@@ -47,18 +55,18 @@ const OrdenHis = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             {order.orderType === 'table' ? `Mesa #${order.tableNumber}` : (order.customerName || `Pedido #${order.id.split('-')[1]}`)}
           </Typography>
-          <Chip 
-            label="Entregado"
-            color="default"
+          <Chip
+            label={order.status}
+            color={getChipColor(order.status)}
             size="small"
-            sx={{ fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.2)' }}
+            sx={{ fontWeight: 'bold' }}
           />
         </Box>
         <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'grey.700' }}>
           {order.items.map(item => (
             <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
-              <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
-              <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
+                <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
             </Box>
           ))}
         </Box>
@@ -74,11 +82,11 @@ const OrdenHis = () => {
     <PageLayout title="Historial de Pedidos" icon={History}>
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress color="secondary" /></Box>
-      ) : deliveredOrders.length > 0 ? (
-        <Grid container spacing={3}>{deliveredOrders.map(renderOrderCard)}</Grid>
+      ) : historyOrders.length > 0 ? (
+        <Grid container spacing={3}>{historyOrders.map(renderOrderCard)}</Grid>
       ) : (
         <GlassmorphicCard sx={{textAlign: 'center', p: 5}}>
-          <Typography variant="h5">Aún no tienes pedidos entregados.</Typography>
+          <Typography variant="h5">No tienes pedidos en tu historial.</Typography>
         </GlassmorphicCard>
       )}
     </PageLayout>

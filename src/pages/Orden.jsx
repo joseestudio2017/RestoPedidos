@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOrders } from '../contexts/OrdersContext';
 import { useRole } from '../contexts/RoleContext';
 import {
-  Typography, Box, Grid, Paper, Select, MenuItem, Chip, CircularProgress, styled, CardMedia
+  Typography, Box, Grid, Paper, Select, MenuItem, Chip, CircularProgress, styled
 } from '@mui/material';
 import { Restore, Kitchen } from '@mui/icons-material';
 import PageLayout from '../components/PageLayout';
@@ -41,11 +41,16 @@ const Orden = () => {
     if (orders) {
       let ordersToDisplay = [...orders];
 
-      // For customers, only show active orders (not 'Entregado')
+      // For customers, only show active orders (not 'Entregado' or 'Cancelado')
       if (role === 'cliente') {
         ordersToDisplay = ordersToDisplay.filter(
-          (order) => order.status !== 'Entregado'
+          (order) => order.status !== 'Entregado' && order.status !== 'Cancelado'
         );
+      } else {
+        // For other roles, also filter out delivered and cancelled
+        ordersToDisplay = ordersToDisplay.filter(
+            (order) => order.status !== 'Entregado' && order.status !== 'Cancelado'
+          );
       }
 
       const sortedOrders = ordersToDisplay.sort(
@@ -77,18 +82,9 @@ const Orden = () => {
         </Box>
         <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'secondary.main' }}>
           {order.items.map(item => (
-            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', py: 1.5, pl: 1.5 }}>
-              <CardMedia
-                component="img"
-                sx={{ width: 60, height: 60, borderRadius: '8px', mr: 2 }}
-                image={item.imageUrl || 'https://via.placeholder.com/150'}
-                alt={item.name}
-              />
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>{item.description}</Typography>
-              </Box>
-              <Typography sx={{ fontWeight: 'medium', ml: 1 }}>${(item.price * item.quantity).toFixed(2)}</Typography>
+            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
+              <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
+              <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
             </Box>
           ))}
         </Box>
