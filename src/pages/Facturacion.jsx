@@ -66,6 +66,16 @@ const GlassmorphicAlert = styled(Alert)(({ theme }) => ({
     }
 }));
 
+const getChipStyle = (status) => {
+    const baseStyle = { color: 'white', fontWeight: 'bold' };
+    switch (status) {
+      case 'Pendiente':
+        return { ...baseStyle, backgroundColor: '#f44336' }; // Rojo
+      default:
+        return {};
+    }
+  };
+
 function Facturacion() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -142,7 +152,7 @@ function Facturacion() {
             <GlassmorphicPaper sx={{ p: { xs: 3, sm: 5 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <CheckCircleOutlineIcon color="success" sx={{ fontSize: { xs: 70, sm: 90 }, mb: 2, filter: 'drop-shadow(0 0 10px limegreen)' }} />
                 <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.8)', mb: 4 }}>
-                    Tu pedido está <Chip label="Pendiente" color="warning" variant="contained" sx={{ fontWeight: 'bold' }} />.
+                    Tu pedido está <Chip label="Pendiente" size="small" sx={getChipStyle('Pendiente')} />.
                 </Typography>
                 <Button onClick={() => navigate('/orden')} variant="contained" size="large">Ver Mis Pedidos</Button>
             </GlassmorphicPaper>

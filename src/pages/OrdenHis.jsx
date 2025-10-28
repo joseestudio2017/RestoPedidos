@@ -23,13 +23,17 @@ const GlassmorphicCard = styled(Paper)(({ theme }) => ({
   height: '100%',
 }));
 
-const getChipColor = (status) => {
+const getChipStyle = (status) => {
+    const baseStyle = { color: 'white', fontWeight: 'bold' };
     switch (status) {
-      case 'Entregado': return 'default';
-      case 'Cancelado': return 'error';
-      default: return 'default';
+        case 'Entregado':
+            return { ...baseStyle, backgroundColor: '#4caf50' }; // Verde
+        case 'Cancelado':
+            return { ...baseStyle, backgroundColor: '#9e9e9e' }; // Gris
+        default:
+            return {};
     }
-  };
+};
 
 const OrdenHis = () => {
   const { orders } = useOrders();
@@ -57,18 +61,20 @@ const OrdenHis = () => {
           </Typography>
           <Chip
             label={order.status}
-            color={getChipColor(order.status)}
             size="small"
-            sx={{ fontWeight: 'bold' }}
+            sx={getChipStyle(order.status)}
           />
         </Box>
         <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'grey.700' }}>
-          {order.items.map(item => (
-            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
-                <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
-                <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
-            </Box>
-          ))}
+          {order.items.map(item => {
+            const itemPrice = (Number(item.price) || 0) * (Number(item.quantity) || 0);
+            return (
+                <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
+                    <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
+                    <Typography sx={{ fontWeight: 'medium' }}>${itemPrice.toFixed(2)}</Typography>
+                </Box>
+            );
+        })}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>

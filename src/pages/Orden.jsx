@@ -19,15 +19,21 @@ const GlassmorphicCard = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
 }));
 
-const getChipColor = (status) => {
+const getChipStyle = (status) => {
+  const baseStyle = { color: 'white', fontWeight: 'bold' };
   switch (status) {
-    case 'Procesando Pago': return 'secondary';
-    case 'Pendiente': return 'warning';
-    case 'En Preparación': return 'info';
-    case 'Listo': return 'success';
-    case 'Entregado': return 'default';
-    case 'Cancelado': return 'error';
-    default: return 'default';
+    case 'Pendiente':
+      return { ...baseStyle, backgroundColor: '#f44336' }; // Rojo
+    case 'En Preparación':
+      return { ...baseStyle, backgroundColor: '#ff9800' }; // Naranja
+    case 'Listo':
+      return { ...baseStyle, backgroundColor: '#ffeb3b', color: '#000' }; // Amarillo
+    case 'Entregado':
+      return { ...baseStyle, backgroundColor: '#4caf50' }; // Verde
+    case 'Cancelado':
+        return { ...baseStyle, backgroundColor: '#9e9e9e' }; // Gris
+    default:
+      return {};
   }
 };
 
@@ -41,17 +47,10 @@ const Orden = () => {
     if (orders) {
       let ordersToDisplay = [...orders];
 
-      // For customers, only show active orders (not 'Entregado' or 'Cancelado')
-      if (role === 'cliente') {
-        ordersToDisplay = ordersToDisplay.filter(
+      // For customers and other roles, filter out delivered and cancelled orders
+      ordersToDisplay = ordersToDisplay.filter(
           (order) => order.status !== 'Entregado' && order.status !== 'Cancelado'
         );
-      } else {
-        // For other roles, also filter out delivered and cancelled
-        ordersToDisplay = ordersToDisplay.filter(
-            (order) => order.status !== 'Entregado' && order.status !== 'Cancelado'
-          );
-      }
 
       const sortedOrders = ordersToDisplay.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -75,18 +74,20 @@ const Orden = () => {
           </Typography>
           <Chip
             label={order.status || 'N/A'}
-            color={getChipColor(order.status)}
             size="small"
-            sx={{ fontWeight: 'bold' }}
+            sx={getChipStyle(order.status)}
           />
         </Box>
         <Box sx={{ flexGrow: 1, my: 2, pl: 1, borderLeft: '2px solid', borderColor: 'secondary.main' }}>
-          {order.items.map(item => (
-            <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
-              <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
-              <Typography sx={{ fontWeight: 'medium' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
-            </Box>
-          ))}
+          {order.items.map(item => {
+            const itemPrice = (Number(item.price) || 0) * (Number(item.quantity) || 0);
+            return (
+                <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, pl: 1.5 }}>
+                <Typography>{item.name} <span style={{color: 'rgba(255,255,255,0.7)'}}>(x{item.quantity})</span></Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>${itemPrice.toFixed(2)}</Typography>
+                </Box>
+            );
+        })}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
