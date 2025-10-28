@@ -44,7 +44,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const Carrito = () => {
-  const { cartItems, selectedTable, numberOfChairs, setTable, updateItemQuantity, removeFromCart, clearCart } = useCart();
+  const { cartItems, selectedTable, numberOfChairs, setTable, updateItemQuantity, removeFromCart, clearCart, addToCart, decreaseFromCart } = useCart();
   const { addOrder } = useOrders();
   const navigate = useNavigate();
   const theme = useTheme();

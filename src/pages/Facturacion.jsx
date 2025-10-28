@@ -107,7 +107,7 @@ function Facturacion() {
 
   const handlePaymentSuccess = () => {
     if (order) {
-      updateOrderStatus(order.id, 'Pedido');
+      updateOrderStatus(order.id, 'Pendiente');
       setIsPaid(true);
       sessionStorage.removeItem('lastOrder');
     }
@@ -135,9 +135,9 @@ function Facturacion() {
             <GlassmorphicPaper sx={{ p: { xs: 3, sm: 5 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <CheckCircleOutlineIcon color="success" sx={{ fontSize: { xs: 70, sm: 90 }, mb: 2, filter: 'drop-shadow(0 0 10px limegreen)' }} />
                 <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.8)', mb: 4 }}>
-                    Tu pedido está <Chip label="Pedido" color="error" variant="contained" sx={{ fontWeight: 'bold' }} />.
+                    Tu pedido está <Chip label="Pendiente" color="warning" variant="contained" sx={{ fontWeight: 'bold' }} />.
                 </Typography>
-                <Button onClick={() => navigate('/orders')} variant="contained" size="large">Ver Mis Pedidos</Button>
+                <Button onClick={() => navigate('/orden')} variant="contained" size="large">Ver Mis Pedidos</Button>
             </GlassmorphicPaper>
         </PageLayout>
     );

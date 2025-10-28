@@ -1,101 +1,92 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import {
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
-  Box
-} from '@mui/material';
+import React, { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { getToken } from 'firebase/messaging';
+import { messaging } from './firebase';
+import { RoleProvider } from './contexts/RoleContext';
+import { MenuProvider } from './contexts/MenuContext';
+import { CartProvider } from './contexts/CartContext';
+import { OrdersProvider } from './contexts/OrdersContext';
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+import theme from './theme';
 
 import Navbar from './components/Navbar';
-import AdminRoute from './components/AdminRoute';
-
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Carrito from './pages/Carrito';
+import Ingreso from './pages/Ingreso';
 import Orden from './pages/Orden';
-import Admin from './pages/Admin.jsx';
-import Ingreso from './pages/Ingreso.jsx';
-import Clientes from './pages/Clientes';
-import Entrega from './pages/Entrega';
-import EntregaHis from './pages/EntregaHis';
 import Facturacion from './pages/Facturacion';
-import TP from './pages/TP';
-
-const darkGlassmorphismTheme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: '#E91E63', // Vibrante rosa
-      },
-      secondary: {
-        main: '#00BFFF', // Azul brillante
-      },
-      background: {
-        default: '#1a1a1a',
-        paper: 'rgba(255, 255, 255, 0.05)',
-      },
-      text: {
-        primary: '#FFFFFF',
-        secondary: 'rgba(255, 255, 255, 0.7)',
-      },
-    },
-    typography: {
-      fontFamily: ['Inter', 'sans-serif'].join(','),
-      button: {
-        textTransform: 'none',
-        fontWeight: 'bold',
-      },
-    },
-    components: {
-        MuiButton: {
-            styleOverrides: {
-                contained: {
-                    boxShadow: '0 0 12px 2px rgba(233, 30, 99, 0.4)',
-                    transition: 'all 0.3s ease-in-out',
-                    '&:hover': {
-                        boxShadow: '0 0 20px 5px rgba(233, 30, 99, 0.6)',
-                    }
-                },
-            },
-        },
-    },
-});
+import MenuABM from './pages/MenuABM';
+import EntregaHis from './pages/EntregaHis';
+import AdminRoute from './components/AdminRoute';
+import './App.css';
 
 function App() {
-  return (
-    <ThemeProvider theme={darkGlassmorphismTheme}>
-      <CssBaseline />
-      <Router>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          background: 'url(https://images.unsplash.com/photo-1541167760496-162885647544) no-repeat center center fixed',
-          backgroundSize: 'cover',
-        }}>
-          <Navbar />
-          <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3, md: 4 } }}>
-            <Routes>
-              {/* Rutas Públicas */}
-              <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/carrito" element={<Carrito />} />
-              <Route path="/orders" element={<Orden />} />
-              <Route path="/ingreso" element={<Ingreso />} />
-              <Route path="/facturacion" element={<Facturacion />} />
-              <Route path="/entrega" element={<Entrega />} />
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          const token = await getToken(messaging, { vapidKey: 'YOUR_VAPID_KEY' }); 
+          console.log('FCM Token:', token);
+        } else {
+          console.log('Unable to get permission to notify.');
+        }
+      } catch (error) {
+        console.error('An error occurred while requesting notification permission. ', error);
+      }
+    };
 
-              {/* Rutas de Admin */}
-              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-              <Route path="/clientes" element={<AdminRoute><Clientes /></AdminRoute>} />
-              <Route path="/tp" element={<AdminRoute><TP /></AdminRoute>} />
-              <Route path="/entrega-his" element={<AdminRoute><EntregaHis /></AdminRoute>} />
-            </Routes>
-          </Box>
-        </Box>
-      </Router>
+    // requestNotificationPermission();
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <RoleProvider>
+        <MenuProvider>
+          <CartProvider>
+            <OrdersProvider>
+              <AppContent />
+            </OrdersProvider>
+          </CartProvider>
+        </MenuProvider>
+      </RoleProvider>
     </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          py: isHomePage ? 0 : { xs: 4, md: 6 }, 
+          px: isHomePage ? 0 : { xs: 2, sm: 3, md: 4 },
+          mt: isHomePage ? '' : '64px'
+        }}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/carrito" element={<Carrito />} />
+          <Route path="/ingreso" element={<Ingreso />} />
+          <Route path="/orden" element={<Orden />} />
+          <Route path="/facturacion" element={<Facturacion />} />
+          <Route path="/menu-abm" element={<AdminRoute><MenuABM /></AdminRoute>} />
+          <Route path="/entrega-historial" element={<AdminRoute><EntregaHis /></AdminRoute>} />
+        </Routes>
+      </Box>
+      {!isHomePage && <Footer />}
+    </Box>
   );
 }
 

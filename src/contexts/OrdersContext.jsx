@@ -1,63 +1,48 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const OrdersContext = createContext();
 
-export const OrdersProvider = ({ children }) => {
-  const [orders, setOrders] = useState(() => {
-    try {
-      const savedOrders = localStorage.getItem('orders');
-      if (savedOrders) {
-        const parsedOrders = JSON.parse(savedOrders);
-        // Migration for old statuses
-        return parsedOrders.map(order => {
-          if (order.status && order.status.toLowerCase() === 'pendiente') {
-            return { ...order, status: 'Pedido' };
-          }
-          return order;
-        });
-      }
-      return [];
-    } catch (error) {
-      console.error("Failed to parse orders from localStorage", error);
-      return [];
-    }
-  });
+export const useOrders = () => useContext(OrdersContext);
 
-  useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }, [orders]);
+const mockOrders = [
+  { 
+    id: 'ORDER-001', 
+    items: [{ name: 'Hamburguesa Clásica', quantity: 1 }, { name: 'Papas Fritas', quantity: 1 }], 
+    status: 'Entregado', 
+    total: 15.50 
+  },
+  { 
+    id: 'ORDER-002', 
+    items: [{ name: 'Pizza Margarita', quantity: 2 }], 
+    status: 'Entregado', 
+    total: 25.00 
+  },
+  { 
+    id: 'ORDER-003', 
+    items: [{ name: 'Ensalada César', quantity: 1 }, { name: 'Refresco', quantity: 1 }], 
+    status: 'Cancelado', 
+    total: 12.00 
+  },
+    { 
+    id: 'ORDER-004', 
+    items: [{ name: 'Hamburguesa Clásica', quantity: 10 }, { name: 'Papas Fritas', quantity: 10 }], 
+    status: 'Entregado', 
+    total: 150.50 
+  },
+];
+
+export const OrdersProvider = ({ children }) => {
+  const [orders, setOrders] = useState(mockOrders);
 
   const addOrder = (newOrder) => {
-    const orderWithDetails = {
-      ...newOrder,
-      id: `order_${Date.now()}`,
-      timestamp: new Date(),
-      status: 'Pedido', // Initial status is Pedido
-    };
-    setOrders((prevOrders) => [...prevOrders, orderWithDetails]);
-    // Return the newly created order so we can use it right away
-    return orderWithDetails;
-  };
-
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+    // Lógica para añadir un nuevo pedido, incluyendo un ID único
+    const orderWithId = { ...newOrder, id: `ORDER-${String(Date.now()).slice(-5)}` };
+    setOrders(prevOrders => [...prevOrders, orderWithId]);
   };
 
   return (
-    <OrdersContext.Provider
-      value={{
-        orders,
-        addOrder,
-        updateOrderStatus,
-      }}
-    >
+    <OrdersContext.Provider value={{ orders, addOrder }}>
       {children}
     </OrdersContext.Provider>
   );
 };
-
-export const useOrders = () => useContext(OrdersContext);
