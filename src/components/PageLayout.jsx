@@ -4,12 +4,12 @@ import { Box, Container, Typography } from '@mui/material';
 const PageLayout = ({ children, title, icon: IconComponent, fullScreen = false }) => {
   const layoutSx = {
     position: 'relative',
-    minHeight: 'calc(100vh - 64px)', // Adjust based on AppBar height
     backgroundImage: 'url(https://images.pexels.com/photos/3220616/pexels-photo-3220616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
     backgroundSize: 'cover',
     backgroundAttachment: 'fixed',
     backgroundPosition: 'center',
-    display: 'flex',
+    minHeight: '100vh', // Ensure layout takes at least full viewport height
+    
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -31,11 +31,13 @@ const PageLayout = ({ children, title, icon: IconComponent, fullScreen = false }
       <Box
         sx={{
           ...layoutSx,
+          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
           color: 'white',
-          p: 3
+          p: 3,
+          boxSizing: 'border-box'
         }}
       >
         <Container maxWidth="md">
@@ -49,8 +51,9 @@ const PageLayout = ({ children, title, icon: IconComponent, fullScreen = false }
     <Box
       sx={{
         ...layoutSx,
-        flexDirection: 'column',
-        py: { xs: 4, md: 6 },
+        pt: `calc(64px + 32px)`, // AppBar height + padding
+        pb: { xs: 4, md: 6 },
+        boxSizing: 'border-box'
       }}
     >
       <Container maxWidth="lg">

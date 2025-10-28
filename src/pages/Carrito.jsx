@@ -44,7 +44,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const Carrito = () => {
-  const { cartItems, selectedTable, numberOfChairs, setTable, updateItemQuantity, removeFromCart, clearCart, addToCart, decreaseFromCart } = useCart();
+  const { cartItems, selectedTable, numberOfChairs, setTable, updateItemQuantity, removeFromCart, clearCart } = useCart();
   const { addOrder } = useOrders();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -69,8 +69,8 @@ const Carrito = () => {
       setError('Por favor, ingresa tu nombre y apellido.');
       return false;
     }
-    if (orderType === 'table' && !selectedTable) {
-      setError('Por favor, selecciona una mesa.');
+    if (orderType === 'table' && (!selectedTable || !numberOfChairs)) {
+      setError('Por favor, selecciona una mesa y número de sillas.');
       return false;
     }
     setError('');
@@ -99,9 +99,14 @@ const Carrito = () => {
     setTable(tableId, chairs);
     setIsModalOpen(false);
   };
+  
+  const isConfirmButtonDisabled = 
+    cartItems.length === 0 ||
+    (orderType === 'table' && (!selectedTable || !numberOfChairs)) ||
+    (orderType === 'takeaway' && !customerName.trim());
 
   const renderOrderOptions = () => (
-    <Box>
+    <GlassmorphicPaper elevation={3} sx={{ p: 2, mb: 3 }}>
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: 'white' }}>Opciones del Pedido</Typography>
       <ToggleButtonGroup
         value={orderType}
@@ -138,11 +143,11 @@ const Carrito = () => {
         />
       )}
       {error && <FormHelperText error sx={{ mt: 1, fontWeight: 'bold' }}>{error}</FormHelperText>}
-    </Box>
+    </GlassmorphicPaper>
   );
 
   const renderCartItems = () => (
-    <Box sx={isMobile ? { pb: '180px' } : {}}>
+    <Box>
       {cartItems.map((item) => (
         <Card key={item.id} sx={theme => ({
           display: 'flex', mb: 2.5, alignItems: 'center',
@@ -197,10 +202,11 @@ const Carrito = () => {
       ) : isMobile ? (
         // =========== MOBILE LAYOUT ===========
         <>
-          <GlassmorphicPaper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <Box sx={{ pb: '180px' }}>
             {renderOrderOptions()}
-          </GlassmorphicPaper>
-          {renderCartItems()}
+            {renderCartItems()}
+          </Box>
+
           <GlassmorphicPaper elevation={8} sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, p: 2, zIndex: 1100, borderRadius: '16px 16px 0 0' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 1 }}>
                 <Typography variant="h6">Subtotal:</Typography>
@@ -213,6 +219,7 @@ const Carrito = () => {
                 size="large"
                 sx={{ mt: 1, py: 1.5, fontWeight: 'bold' }}
                 onClick={handleConfirmOrder}
+                disabled={isConfirmButtonDisabled}
               >
                 Confirmar y Pagar
               </Button>
@@ -240,7 +247,7 @@ const Carrito = () => {
                 size="large"
                 sx={{ mt: 3, py: 1.5, fontWeight: 'bold' }}
                 onClick={handleConfirmOrder}
-                disabled={cartItems.length === 0}
+                disabled={isConfirmButtonDisabled}
               >
                 Confirmar y Pagar
               </Button>

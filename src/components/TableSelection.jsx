@@ -1,174 +1,169 @@
 import React, { useState } from 'react';
-import { Box, Grid, Typography, Button, Paper, useTheme, TextField, Collapse } from '@mui/material';
-import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
+import {
+    Typography,
+    Box,
+    Grid,
+    Card,
+    CardActionArea,
+    TextField,
+    Button,
+    IconButton,
+    styled,
+} from '@mui/material';
+import { Close } from '@mui/icons-material';
 
-const tables = [
-  // A simple layout for demonstration
-  { id: 'T1', status: 'available' }, { id: 'T2', status: 'available' }, { id: 'T3', status: 'occupied' }, { id: 'T4', status: 'available' },
-  { id: 'T5', status: 'available' }, { id: 'T6', status: 'available' }, { id: 'T7', status: 'available' }, { id: 'T8', status: 'occupied' },
-  { id: 'T9', status: 'available' }, { id: 'T10', status: 'occupied' }, { id: 'T11', status: 'available' }, { id: 'T12', status: 'available' },
-  { id: 'T13', status: 'available' }, { id: 'T14', status: 'available' }, { id: 'T15', status: 'available' }, { id: 'T16', status: 'available' },
+const locations = [
+    { id: 'Terraza', tables: 10 },
+    { id: 'Salón Principal', tables: 20 },
+    { id: 'Patio', tables: 8 },
+    { id: 'Barra', tables: 12 },
+    { id: 'Salón VIP', tables: 5 },
 ];
 
+const GlassmorphicCard = styled(Card)(({ theme }) => ({
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '12px',
+    color: 'white',
+    height: '100px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    transition: 'all 0.3s ease',
+    '&.selected': {
+        backgroundColor: 'rgba(233, 30, 99, 0.5)', // Secondary color with alpha
+        boxShadow: `0 0 15px 2px ${theme.palette.secondary.main}`,
+        transform: 'scale(1.05)'
+    },
+    '&:hover': {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        transform: 'scale(1.02)'
+    }
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& label.Mui-focused': {
+        color: theme.palette.secondary.main,
+    },
+    '& .MuiInputLabel-root': {
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    '& .MuiOutlinedInput-root': {
+        color: 'white',
+        '& fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+        },
+        '&:hover fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.7)',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.secondary.main,
+        },
+    },
+}));
+
 const TableSelection = ({ onSelectTable, onCancel }) => {
-  const [selectedTable, setSelectedTable] = useState(null);
-  const [numberOfChairs, setNumberOfChairs] = useState('');
-  const [chairError, setChairError] = useState('');
-  const theme = useTheme();
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedTable, setSelectedTable] = useState(null);
+    const [numberOfChairs, setNumberOfChairs] = useState('');
 
-  const handleTableClick = (table) => {
-    if (table.status === 'available') {
-      const newSelectedTable = table.id === selectedTable ? null : table.id;
-      setSelectedTable(newSelectedTable);
-      // Reset chairs and error if table is deselected
-      if (!newSelectedTable) {
-        setNumberOfChairs('');
-        setChairError('');
-      }
-    }
-  };
-
-  const handleChairsChange = (event) => {
-    const value = event.target.value;
-    // Allow only integers
-    if (value === '' || /^[0-9]+$/.test(value)) {
-        setNumberOfChairs(value);
-        const num = parseInt(value, 10);
-        if (value !== '' && (num < 1 || num > 4)) {
-            setChairError('Debe ser entre 1 y 4');
-        } else {
-            setChairError('');
-        }
-    }
-  };
-
-  const handleConfirm = () => {
-    if (selectedTable && numberOfChairs > 0 && !chairError) {
-      onSelectTable(selectedTable, parseInt(numberOfChairs, 10));
-    }
-  };
-
-  const getTableStyle = (table) => {
-    const isSelected = selectedTable === table.id;
-    const isOccupied = table.status === 'occupied';
-
-    let backgroundColor = theme.palette.grey[300];
-    let color = theme.palette.text.primary;
-    let borderColor = theme.palette.grey[400];
-
-    if (isOccupied) {
-      backgroundColor = theme.palette.grey[500];
-      color = theme.palette.getContrastText(backgroundColor);
-      borderColor = theme.palette.grey[600];
-    } else if (isSelected) {
-      backgroundColor = theme.palette.secondary.main;
-      color = theme.palette.secondary.contrastText;
-      borderColor = theme.palette.secondary.dark;
-    } else {
-       backgroundColor = '#4CAF50'; // Green for available
-       color = 'white';
-       borderColor = '#388E3C';
-    }
-
-    return {
-      minWidth: '60px',
-      height: '60px',
-      flexDirection: 'column',
-      backgroundColor,
-      color,
-      border: `2px solid ${borderColor}`,
-      transition: 'transform 0.1s, background-color 0.2s',
-      '&:hover': {
-        backgroundColor: !isOccupied && (isSelected ? theme.palette.secondary.dark : '#66BB6A'),
-        transform: !isOccupied ? 'scale(1.05)' : 'none',
-      },
-      '&.Mui-disabled': {
-          backgroundColor: theme.palette.grey[500],
-          color: theme.palette.getContrastText(theme.palette.grey[500]),
-          border: `2px solid ${theme.palette.grey[600]}`
-      }
+    const handleSelectLocation = (locationId) => {
+        setSelectedLocation(locationId);
+        setSelectedTable(null); // Reset table when location changes
     };
-  };
 
-  const Legend = () => (
-     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}><TableRestaurantIcon sx={{ color: '#4CAF50', mr: 1 }} /> Disponible</Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}><TableRestaurantIcon sx={{ color: 'secondary.main', mr: 1 }} /> Seleccionada</Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}><TableRestaurantIcon sx={{ color: 'grey.500', mr: 1 }} /> Ocupada</Box>
-    </Box>
-  );
+    const handleSelectTable = (tableNumber) => {
+        setSelectedTable(tableNumber);
+    };
 
-  return (
-    <Paper sx={{ p: { xs: 2, sm: 4 }, textAlign: 'center', boxShadow: 24, borderRadius: 2 }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>Seleccione su Mesa</Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>Haga clic en una mesa disponible para seleccionarla.</Typography>
+    const handleConfirm = () => {
+        if (selectedTable !== null && numberOfChairs > 0) {
+            onSelectTable(selectedTable, numberOfChairs);
+        }
+    };
 
-      <Box sx={{
-        p: 2,
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        mb: 3,
-        maxWidth: '500px',
-        mx: 'auto'
-      }}>
-        <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
-          {tables.map(table => (
-            <Grid item key={table.id}>
-              <Button
-                variant="contained"
-                onClick={() => handleTableClick(table)}
-                disabled={table.status === 'occupied'}
-                sx={getTableStyle(table)}
-              >
-                <TableRestaurantIcon />
-                <Typography variant="caption" sx={{ fontWeight: 'bold' }}>{table.id}</Typography>
-              </Button>
+    const renderTableSelector = () => {
+        if (!selectedLocation) return null;
+        const location = locations.find(l => l.id === selectedLocation);
+        if (!location) return null;
+
+        return (
+            <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" gutterBottom align="center">Selecciona una mesa en {selectedLocation}</Typography>
+                <Grid container spacing={2} sx={{ maxHeight: '200px', overflowY: 'auto', p: 1 }}>
+                    {Array.from({ length: location.tables }, (_, i) => i + 1).map((tableNumber) => (
+                        <Grid item xs={4} sm={3} key={tableNumber}>
+                            <GlassmorphicCard
+                                className={selectedTable === `${selectedLocation} - ${tableNumber}` ? 'selected' : ''}
+                                sx={{ height: 80 }}
+                            >
+                                <CardActionArea onClick={() => handleSelectTable(`${selectedLocation} - ${tableNumber}`)} sx={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{tableNumber}</Typography>
+                                </CardActionArea>
+                            </GlassmorphicCard>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
+        );
+    };
+
+    return (
+        <Box sx={{ maxWidth: 600, width: '90vw', p: { xs: 2, sm: 4 }, backgroundColor: 'rgba(30, 30, 30, 0.9)', borderRadius: '16px', color: 'white', position: 'relative' }}>
+            <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 8, right: 8, color: 'white' }}>
+                <Close />
+            </IconButton>
+            <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+                Selección de Lugar
+            </Typography>
+            <Typography variant="body1" align="center" sx={{ mb: 3, color: 'rgba(255,255,255,0.8)' }}>
+                Elige dónde disfrutarás tu comida.
+            </Typography>
+            <Grid container spacing={2}>
+                {locations.map((loc) => (
+                    <Grid item xs={6} sm={4} key={loc.id}>
+                        <GlassmorphicCard className={selectedLocation === loc.id ? 'selected' : ''}>
+                            <CardActionArea onClick={() => handleSelectLocation(loc.id)} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 1 }}>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold', textAlign: 'center' }}>{loc.id}</Typography>
+                                <Typography variant="caption">{loc.tables} mesas</Typography>
+                            </CardActionArea>
+                        </GlassmorphicCard>
+                    </Grid>
+                ))}
             </Grid>
-          ))}
-        </Grid>
-      </Box>
 
-      <Collapse in={!!selectedTable}>
-          <Box sx={{ mt: 3, mb: 2, maxWidth: '300px', mx: 'auto' }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium' }}>¿Cuántas personas son?</Typography>
-            <TextField
-              id="number-of-chairs"
-              label="Número de Sillas"
-              type="number"
-              variant="outlined"
-              fullWidth
-              value={numberOfChairs}
-              onChange={handleChairsChange}
-              error={!!chairError}
-              helperText={chairError}
-              InputProps={{
-                  inputProps: {
-                      min: 1,
-                      max: 4,
-                      step: 1
-                  }
-              }}
-              autoFocus
-            />
-          </Box>
-      </Collapse>
+            {renderTableSelector()}
 
-      <Legend />
-
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <Button variant="outlined" color="primary" onClick={onCancel}>Cancelar</Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleConfirm}
-          disabled={!selectedTable || !numberOfChairs || !!chairError}
-        >
-          Confirmar Mesa
-        </Button>
-      </Box>
-    </Paper>
-  );
+            {selectedTable && (
+                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <StyledTextField
+                        label="Número de Sillas"
+                        type="number"
+                        value={numberOfChairs}
+                        onChange={(e) => setNumberOfChairs(parseInt(e.target.value, 10) || '')}
+                        variant="outlined"
+                        fullWidth
+                        inputProps={{ min: 1 }}
+                    />
+                </Box>
+            )}
+             {(selectedTable && numberOfChairs) && (
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                    <Button variant="outlined" color="secondary" onClick={onCancel}>Cancelar</Button>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={handleConfirm} 
+                        disabled={!selectedTable || !numberOfChairs || numberOfChairs < 1}
+                    >
+                        Confirmar Selección
+                    </Button>
+                </Box>
+            )}
+        </Box>
+    );
 };
 
 export default TableSelection;
