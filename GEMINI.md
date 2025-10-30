@@ -1,99 +1,99 @@
-# **AI Development Guidelines for React in Firebase Studio**
+# **Directrices de Desarrollo con IA para React en Firebase Studio**
 
-These guidelines define the operational principles and capabilities of an AI agent (e.g., Gemini) interacting with React projects within the Firebase Studio environment. The goal is to enable an efficient, automated, and error-resilient application design and development workflow, focusing on modern React practices.
+Estas directrices definen los principios operativos y las capacidades de un agente de IA (por ejemplo, Gemini) que interactúa con proyectos de React dentro del entorno de Firebase Studio. El objetivo es permitir un flujo de trabajo de diseño y desarrollo de aplicaciones eficiente, automatizado y resistente a errores, centrándose en las prácticas modernas de React.
 
-## **Environment & Context Awareness**
+## **Conciencia del Entorno y Contexto**
 
-The AI operates within the Firebase Studio development environment, which provides a Code OSS-based IDE with deep integration for React and Firebase services.
+La IA opera dentro del entorno de desarrollo de Firebase Studio, que proporciona un IDE basado en Code OSS con una profunda integración para los servicios de React y Firebase.
 
-* **Project Structure:** The AI assumes a standard React project structure, likely initialized with Vite. The primary application entry point is typically `src/main.jsx` or `src/main.tsx`.
-* **`dev.nix` Configuration:**
-  * The `.idx/dev.nix` file is the declarative source of truth for the workspace environment. The AI understands its role in defining:
-    * Required system tools (e.g., `pkgs.nodejs_20`).
-    * IDE extensions.
-    * Environment variables.
-    * Startup commands (`idx.workspace.onStart`).
-  * The AI should leverage `dev.nix` to ensure environment consistency and to automatically configure necessary tools or verify their presence.
-* **Preview Server:**
-  * Firebase Studio provides a running preview server for the web, configured in `dev.nix`.
-  * The `web` preview is configured to run `npm run dev -- --port $PORT --host 0.0.0.0`, meaning the Vite dev server is already running and available on a specific port.
-  * The AI will continuously monitor the output of the preview server for real-time feedback on changes.
-* **Firebase Integration:** The AI recognizes standard Firebase integration patterns in React, including the use of a `firebase.js` or `firebase.ts` configuration file and interactions with various Firebase SDKs.
+*   **Estructura del Proyecto:** La IA asume una estructura de proyecto de React estándar, probablemente inicializada con Vite. El punto de entrada principal de la aplicación es típicamente `src/main.jsx` o `src/main.tsx`.
+*   **Configuración de `dev.nix`:**
+    *   El archivo `.idx/dev.nix` es la fuente declarativa de verdad para el entorno del espacio de trabajo. La IA entiende su papel en la definición de:
+        *   Herramientas de sistema requeridas (por ejemplo, `pkgs.nodejs_20`).
+        *   Extensiones del IDE.
+        *   Variables de entorno.
+        *   Comandos de inicio (`idx.workspace.onStart`).
+    *   La IA debe aprovechar `dev.nix` para garantizar la consistencia del entorno y para configurar automáticamente las herramientas necesarias o verificar su presencia.
+*   **Servidor de Vista Previa:**
+    *   Firebase Studio proporciona un servidor de vista previa en ejecución para la web, configurado en `dev.nix`.
+    *   La vista previa `web` está configurada para ejecutar `npm run dev -- --port $PORT --host 0.0.0.0`, lo que significa que el servidor de desarrollo de Vite ya está en funcionamiento y disponible en un puerto específico.
+    *   La IA monitoreará continuamente la salida del servidor de vista previa para obtener retroalimentación en tiempo real sobre los cambios.
+*   **Integración con Firebase:** La IA reconoce los patrones de integración estándar de Firebase en React, incluido el uso de un archivo de configuración `firebase.js` o `firebase.ts` y las interacciones con varios SDK de Firebase.
 
-## **Code Modification & Dependency Management**
+## **Modificación de Código y Gestión de Dependencias**
 
-The AI is empowered to modify the React codebase and manage its dependencies autonomously based on user requests and detected issues. The AI is creative and anticipates features that the user might need even if not explicitly requested.
+La IA está capacitada para modificar el código base de React y gestionar sus dependencias de forma autónoma en función de las solicitudes del usuario y los problemas detectados. La IA es creativa y anticipa características que el usuario podría necesitar incluso si no se solicitan explícitamente.
 
-* **Core Code Assumption:** When a user requests a change (e.g., "Add a button to navigate to a new page"), the AI will primarily focus on modifying the JSX/TSX code. `src/App.jsx` (or `tsx`) is assumed to be the main component, and the AI will infer other relevant files (e.g., creating new component files, updating `package.json`).
-* **Package Management:** If a new feature requires an external package, the AI will identify the most suitable and stable package from npm.
-  * To add a regular dependency, it will execute `npm install <package_name>`.
-  * To add a development dependency (e.g., for testing or linting), it will execute `npm install -D <package_name>`.
-* **Code Quality:** The AI aims to adhere to React best practices, including:
-  * Clean code structure and separation of concerns (e.g., UI logic separate from business logic).
-  * Meaningful and consistent naming conventions.
-  * Effective use of functional components and hooks.
-  * Appropriate state management solutions (e.g., component state, context, or a dedicated library like Zustand or Redux Toolkit).
-  * Proper use of `async/await` for asynchronous operations with robust error handling.
+*   **Suposición del Código Principal:** Cuando un usuario solicita un cambio (por ejemplo, "Añade un botón para navegar a una nueva página"), la IA se centrará principalmente en modificar el código JSX/TSX. Se asume que `src/App.jsx` (o `tsx`) es el componente principal, y la IA inferirá otros archivos relevantes (por ejemplo, creando nuevos archivos de componentes, actualizando `package.json`).
+*   **Gestión de Paquetes:** Si una nueva característica requiere un paquete externo, la IA identificará el paquete más adecuado y estable de npm.
+    *   Para añadir una dependencia regular, ejecutará `npm install <nombre_del_paquete>`.
+    *   Para añadir una dependencia de desarrollo (por ejemplo, para pruebas o linting), ejecutará `npm install -D <nombre_del_paquete>`.
+*   **Calidad del Código:** La IA tiene como objetivo adherirse a las mejores prácticas de React, que incluyen:
+    *   Estructura de código limpia y separación de preocupaciones (por ejemplo, lógica de la interfaz de usuario separada de la lógica de negocio).
+    *   Convenciones de nomenclatura significativas y consistentes.
+    *   Uso efectivo de componentes funcionales y hooks.
+    *   Soluciones de gestión de estado apropiadas (por ejemplo, estado del componente, contexto o una biblioteca dedicada como Zustand o Redux Toolkit).
+    *   Uso adecuado de `async/await` para operaciones asíncronas con un manejo de errores robusto.
 
-## **Automated Error Detection & Remediation**
+## **Detección y Corrección Automatizada de Errores**
 
-A critical function of the AI is to continuously monitor for and automatically resolve errors to maintain a runnable and correct application state.
+Una función crítica de la IA es monitorear continuamente y resolver automáticamente los errores para mantener un estado de la aplicación ejecutable y correcto.
 
-* **Post-Modification Checks:** After *every* code modification (including adding packages, or modifying existing files), the AI will:
-  1. Monitor the IDE's diagnostics (problem pane) and the terminal output for compilation errors, linting warnings, and runtime exceptions.
-  2. Check the Vite dev server's output for rendering issues, application crashes, or unexpected behavior.
-* **Automatic Error Correction:** The AI will attempt to automatically fix detected errors. This includes, but is not limited to:
-  * Syntax errors in JSX/TSX code.
-  * Type mismatches (if using TypeScript).
-  * Unresolved imports or missing package references.
-  * Linting rule violations (the AI will automatically run `eslint . --fix`).
-  * Common React-specific issues such as incorrect hook usage, or invalid component returns.
-* **Problem Reporting:** If an error cannot be automatically resolved (e.g., a logic error requiring user clarification, or an environment issue), the AI will clearly report the specific error message, its location, and a concise explanation with a suggested manual intervention or alternative approach to the user.
+*   **Verificaciones Posteriores a la Modificación:** Después de *cada* modificación del código (incluida la adición de paquetes o la modificación de archivos existentes), la IA:
+    1.  Monitoreará los diagnósticos del IDE (panel de problemas) y la salida del terminal en busca de errores de compilación, advertencias de linting y excepciones en tiempo de ejecución.
+    2.  Verificará la salida del servidor de desarrollo de Vite en busca de problemas de renderizado, bloqueos de la aplicación o comportamiento inesperado.
+*   **Corrección Automática de Errores:** La IA intentará corregir automáticamente los errores detectados. Esto incluye, pero no se limita a:
+    *   Errores de sintaxis en el código JSX/TSX.
+    *   Incompatibilidades de tipo (si se usa TypeScript).
+    *   Importaciones no resueltas o referencias a paquetes faltantes.
+    *   Violaciones de las reglas de linting (la IA ejecutará automáticamente `eslint . --fix`).
+    *   Problemas comunes específicos de React, como el uso incorrecto de hooks o retornos de componentes no válidos.
+*   **Informe de Problemas:** Si un error no se puede resolver automáticamente (por ejemplo, un error de lógica que requiere una aclaración del usuario o un problema de entorno), la IA informará claramente el mensaje de error específico, su ubicación y una explicación concisa con una sugerencia de intervención manual o un enfoque alternativo al usuario.
 
-## **Modern React Practices**
+## **Prácticas Modernas de React**
 
 ### **React Compiler**
 
-The AI will leverage the React Compiler for automatic memoization, reducing the need for manual `useMemo` and `useCallback` hooks. This leads to cleaner and more performant code. The AI will assume the compiler is enabled for the project.
+La IA aprovechará el Compilador de React para la memorización automática, reduciendo la necesidad de los hooks manuales `useMemo` y `useCallback`. Esto conduce a un código más limpio y con mejor rendimiento. La IA asumirá que el compilador está habilitado para el proyecto.
 
 ### **React Server Components (RSC)**
 
-For projects using a framework that supports RSC (like Next.js), the AI will adopt the following principles:
+Para proyectos que utilizan un framework que soporta RSC (como Next.js), la IA adoptará los siguientes principios:
 
-* **Server-Side Logic:** Components that fetch data or perform server-side logic will be implemented as Server Components.
-* **Client-Side Interactivity:** Components that require user interaction or client-side state will be marked with the `"use client"` directive.
-* **Data Fetching:** The AI will use `async/await` directly within Server Components for clean and efficient data fetching.
+*   **Lógica del Lado del Servidor:** Los componentes que obtienen datos o realizan lógica del lado del servidor se implementarán como Componentes de Servidor.
+*   **Interactividad del Lado del Cliente:** Los componentes que requieren interacción del usuario o estado del lado del cliente se marcarán con la directiva `"use client"`.
+*   **Obtención de Datos:** La IA usará `async/await` directamente dentro de los Componentes de Servidor para una obtención de datos limpia y eficiente.
 
-## **Styling**
+## **Estilos**
 
-The AI will use a consistent styling approach, preferring modern solutions like Tailwind CSS or CSS-in-JS libraries (e.g., styled-components, Emotion) if they are already present in the project. If no styling solution is present, the AI will default to using CSS Modules.
+La IA utilizará un enfoque de estilos consistente, prefiriendo soluciones modernas como Tailwind CSS o bibliotecas CSS-in-JS (por ejemplo, styled-components, Emotion) si ya están presentes en el proyecto. Si no hay una solución de estilos presente, la IA utilizará por defecto Módulos CSS.
 
-## **Visual Design**
+## **Diseño Visual**
 
-**Aesthetics:** The AI always makes a great first impression by creating a unique user experience that incorporates modern components, a visually balanced layout with clean spacing, and polished styles that are easy to understand.
+**Estética:** La IA siempre causa una excelente primera impresión creando una experiencia de usuario única que incorpora componentes modernos, un diseño visualmente equilibrado con un espaciado limpio y estilos pulidos que son fáciles de entender.
 
-1. Build beautiful and intuitive user interfaces that follow modern design guidelines.
-2. Ensure your app is mobile responsive and adapts to different screen sizes, working perfectly on mobile and web.
-3. Propose colors, fonts, typography, iconography, animation, effects, layouts, texture, drop shadows, gradients, etc.
-4. If images are needed, make them relevant and meaningful, with appropriate size, layout, and licensing (e.g., freely available). If real images are not available, provide placeholder images.
-5. If there are multiple pages for the user to interact with, provide an intuitive and easy navigation bar or controls.
+1.  Construir interfaces de usuario hermosas e intuitivas que sigan las pautas de diseño moderno.
+2.  Asegurarse de que la aplicación sea responsiva en móviles y se adapte a diferentes tamaños de pantalla, funcionando perfectamente en móviles y web.
+3.  Proponer colores, fuentes, tipografía, iconografía, animaciones, efectos, diseños, texturas, sombras paralelas, degradados, etc.
+4.  Si se necesitan imágenes, hacerlas relevantes y significativas, con un tamaño, diseño y licencia apropiados (por ejemplo, de libre disposición). Si no hay imágenes reales disponibles, proporcionar imágenes de marcador de posición.
+5.  Si hay varias páginas con las que el usuario puede interactuar, proporcionar una barra de navegación o controles intuitivos y fáciles de usar.
 
-**Bold Definition:** The AI uses modern, interactive iconography, images, and UI components like buttons, text fields, animation, effects, gestures, sliders, carousels, navigation, etc.
+**Definición Audaz:** La IA utiliza iconografía, imágenes y componentes de interfaz de usuario modernos e interactivos como botones, campos de texto, animaciones, efectos, gestos, controles deslizantes, carruseles, navegación, etc.
 
-1. Fonts \- Choose expressive and relevant typography. Stress and emphasize font sizes to ease understanding, e.g., hero text, section headlines, list headlines, keywords in paragraphs, etc.
-2. Color \- Include a wide range of color concentrations and hues in the palette to create a vibrant and energetic look and feel.
-3. Texture \- Apply subtle noise texture to the main background to add a premium, tactile feel.
-4. Visual effects \- Multi-layered drop shadows create a strong sense of depth. Cards have a soft, deep shadow to look "lifted."
-5. Iconography \- Incorporate icons to enhance the user’s understanding and the logical navigation of the app.
-6. Interactivity \- Buttons, checkboxes, sliders, lists, charts, graphs, and other interactive elements have a shadow with elegant use of color to create a "glow" effect.
+1.  **Fuentes** - Elegir una tipografía expresiva y relevante. Acentuar y enfatizar los tamaños de fuente para facilitar la comprensión, por ejemplo, texto de héroe, titulares de sección, titulares de lista, palabras clave en párrafos, etc.
+2.  **Color** - Incluir una amplia gama de concentraciones de color y matices en la paleta para crear una apariencia vibrante y enérgica.
+3.  **Textura** - Aplicar una sutil textura de ruido al fondo principal para añadir una sensación táctil y de primera calidad.
+4.  **Efectos Visuales** - Las sombras paralelas de varias capas crean una fuerte sensación de profundidad. Las tarjetas tienen una sombra suave y profunda para parecer "levantadas".
+5.  **Iconografía** - Incorporar iconos para mejorar la comprensión del usuario y la navegación lógica de la aplicación.
+6.  **Interactividad** - Los botones, casillas de verificación, controles deslizantes, listas, gráficos y otros elementos interactivos tienen una sombra con un uso elegante del color para crear un efecto de "resplandor".
 
-## **Accessibility or A11Y Standards:** The AI implements accessibility features to empower all users, assuming a wide variety of users with different physical abilities, mental abilities, age groups, education levels, and learning styles.
+## **Estándares de Accesibilidad o A11Y:** La IA implementa características de accesibilidad para empoderar a todos los usuarios, asumiendo una amplia variedad de usuarios con diferentes habilidades físicas, mentales, grupos de edad, niveles educativos y estilos de aprendizaje.
 
-## **Routing and Navigation**
+## **Enrutamiento y Navegación**
 
-For routing, the AI will use `react-router-dom` as the default.
+Para el enrutamiento, la IA utilizará `react-router-dom` por defecto.
 
-* **Basic Routing:**
+*   **Enrutamiento Básico:**
 
 ```
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -112,7 +112,7 @@ function App() {
 }
 ```
 
-* **Navigation:**
+*   **Navegación:**
 
 ```
 import { Link, useNavigate } from "react-router-dom";
@@ -129,46 +129,46 @@ function MyComponent() {
 }
 ```
 
-## **Component Library Selection**
+## **Selección de Bibliotecas de Componentes**
 
-The AI will assist in selecting and integrating a component library that best fits the project's needs. The following are popular choices that the AI is familiar with:
+La IA ayudará a seleccionar e integrar una biblioteca de componentes que mejor se adapte a las necesidades del proyecto. Las siguientes son opciones populares con las que la IA está familiarizada:
 
-* **MUI (formerly Material-UI):** A comprehensive suite of components that implement Google's Material Design. Ideal for a wide range of projects, from simple websites to complex enterprise applications.
-* **Ant Design:** A top-tier library for enterprise-level applications, with a focus on a consistent design language and internationalization support.
-* **React-Bootstrap:** A great choice for quickly building responsive and familiar-looking interfaces, especially if the team is already familiar with Bootstrap.
-* **Chakra UI:** Known for its focus on accessibility and developer experience, providing a set of composable and accessible components that are easy to theme and customize.
-* **Shadcn/ui:** A collection of reusable components that you can copy and paste into your project, built on top of Tailwind CSS and Radix UI. This provides maximum control over the code and avoids adding another dependency to your project.
-* **Mantine:** A comprehensive library with over 100 customizable components and 50 hooks, known for its ease of use and extensive feature set.
+*   **MUI (anteriormente Material-UI):** Una suite completa de componentes que implementan el Material Design de Google. Ideal para una amplia gama de proyectos, desde sitios web simples hasta aplicaciones empresariales complejas.
+*   **Ant Design:** Una biblioteca de primer nivel para aplicaciones de nivel empresarial, con un enfoque en un lenguaje de diseño consistente y soporte para internacionalización.
+*   **React-Bootstrap:** Una excelente opción para construir rápidamente interfaces responsivas y de aspecto familiar, especialmente si el equipo ya está familiarizado con Bootstrap.
+*   **Chakra UI:** Conocida por su enfoque en la accesibilidad y la experiencia del desarrollador, proporcionando un conjunto de componentes componibles y accesibles que son fáciles de tematizar y personalizar.
+*   **Shadcn/ui:** Una colección de componentes reutilizables que puedes copiar y pegar en tu proyecto, construida sobre Tailwind CSS y Radix UI. Esto proporciona el máximo control sobre el código y evita añadir otra dependencia a tu proyecto.
+*   **Mantine:** Una biblioteca completa con más de 100 componentes personalizables y 50 hooks, conocida por su facilidad de uso y su extenso conjunto de características.
 
-## **Best Practices for Implementation**
+## **Mejores Prácticas para la Implementación**
 
-### **Theming and Customization**
+### **Tematización y Personalización**
 
-* **Favor Theming:** Instead of directly overriding component styles with CSS, the AI will leverage the library's built-in theming capabilities. This leads to more maintainable and consistent styling.
-* **Wrapper Components:** The AI will create wrapper components around the library's components to enforce project-specific logic and styles. This also simplifies potential future migrations to a different library.
+*   **Favorecer la Tematización:** En lugar de sobrescribir directamente los estilos de los componentes con CSS, la IA aprovechará las capacidades de tematización incorporadas de la biblioteca. Esto conduce a un estilo más mantenible y consistente.
+*   **Componentes Envoltorio (Wrapper):** La IA creará componentes envoltorio alrededor de los componentes de la biblioteca para hacer cumplir la lógica y los estilos específicos del proyecto. Esto también simplifica posibles migraciones futuras a una biblioteca diferente.
 
-### **Performance Optimization**
+### **Optimización del Rendimiento**
 
-* **Tree Shaking:** The AI will import only the components that are needed to reduce the application's bundle size.
-* **Lazy Loading:** The AI will use `React.lazy` and `Suspense` to lazy load components, improving the initial load time of the application.
+*   **Tree Shaking:** La IA importará solo los componentes que se necesitan para reducir el tamaño del paquete de la aplicación.
+*   **Carga Diferida (Lazy Loading):** La IA usará `React.lazy` y `Suspense` para cargar componentes de forma diferida, mejorando el tiempo de carga inicial de la aplicación.
 
-### **Accessibility**
+### **Accesibilidad**
 
-The AI will prioritize using component libraries that follow WAI-ARIA standards to ensure the application is usable by a wider audience.
+La IA priorizará el uso de bibliotecas de componentes que sigan los estándares WAI-ARIA para garantizar que la aplicación sea utilizable por una audiencia más amplia.
 
-### **Code Consistency**
+### **Consistencia del Código**
 
-The AI will maintain a consistent coding style and structure throughout the project, including naming conventions and file organization.
+La IA mantendrá un estilo y una estructura de codificación consistentes en todo el proyecto, incluidas las convenciones de nomenclatura y la organización de archivos.
 
-## **Example: Using Material-UI**
+## **Ejemplo: Uso de Material-UI**
 
-### **Installation**
+### **Instalación**
 
 ```shell
 npm install @mui/material @emotion/react @emotion/styled
 ```
 
-### **Theming**
+### **Tematización**
 
 ```
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -185,68 +185,68 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      {/* ... your components */}
+      {/* ... tus componentes */}
     </ThemeProvider>
   );
 }
 ```
 
-### **Using Components**
+### **Uso de Componentes**
 
 ```
 import Button from '@mui/material/Button';
 
 function MyComponent() {
-  return <Button variant="contained">Hello World</Button>;
+  return <Button variant="contained">Hola Mundo</Button>;
 }
 ```
 
-## **State Management**
+## **Gestión del Estado**
 
-The AI will use the simplest appropriate state management solution for the job.
+La IA utilizará la solución de gestión de estado más simple y apropiada para el trabajo.
 
-* **Component State (`useState`, `useReducer`):** For local state that is not shared with other components.
-* **Context API (`useContext`):** For state that needs to be shared with a few components, but not globally.
-* **Zustand or Redux Toolkit:** For complex, global state that is shared across many components. The AI will recommend and use one of these libraries if the application's state management needs become complex.
+*   **Estado del Componente (`useState`, `useReducer`):** Para el estado local que no se comparte con otros componentes.
+*   **Context API (`useContext`):** Para el estado que necesita ser compartido con algunos componentes, pero no globalmente.
+*   **Zustand o Redux Toolkit:** Para un estado global complejo que se comparte entre muchos componentes. La IA recomendará y usará una de estas bibliotecas si las necesidades de gestión de estado de la aplicación se vuelven complejas.
 
-## **Test Generation & Execution**
+## **Generación y Ejecución de Pruebas**
 
-When requested, the AI will facilitate the creation and execution of tests, ensuring code reliability and validating functionality.
+Cuando se solicite, la IA facilitará la creación y ejecución de pruebas, garantizando la fiabilidad del código y validando la funcionalidad.
 
-* **Test Writing:**
-  * Upon user request for tests (e.g., "Write tests for this new feature"), the AI will generate appropriate test files (e.g., `src/components/MyComponent.test.jsx`).
-  * The AI will use Vitest as the testing framework and React Testing Library for rendering and interacting with components.
-  * Tests will be designed to cover different component states, user interactions, and edge cases.
-* **Automated Test Execution:**
-  * After generating or modifying tests, and after any significant code change, the AI will automatically execute the relevant tests using `npm test` in the terminal.
-  * The AI will report test results (pass/fail, with details on failures) to the user.
+*   **Escritura de Pruebas:**
+    *   Tras la solicitud del usuario de pruebas (por ejemplo, "Escribe pruebas para esta nueva característica"), la IA generará los archivos de prueba apropiados (por ejemplo, `src/components/MyComponent.test.jsx`).
+    *   La IA utilizará Vitest como el framework de pruebas y React Testing Library para renderizar e interactuar con los componentes.
+    *   Las pruebas se diseñarán para cubrir diferentes estados de los componentes, interacciones del usuario y casos límite.
+*   **Ejecución Automatizada de Pruebas:**
+    *   Después de generar o modificar pruebas, y después de cualquier cambio significativo en el código, la IA ejecutará automáticamente las pruebas relevantes usando `npm test` en el terminal.
+    *   La IA informará los resultados de las pruebas (aprobado/fallido, con detalles sobre los fallos) al usuario.
 
-## **Iterative Development & User Interaction**
+## **Desarrollo Iterativo e Interacción con el Usuario**
 
-The AI's workflow is iterative, transparent, and responsive to user input.
+El flujo de trabajo de la IA es iterativo, transparente y receptivo a la entrada del usuario.
 
-* **Plan Generation & Blueprint Management:** Each time the user requests a change, the AI will first generate a clear plan overview and a list of actionable steps. This plan will then be used to **create or update a blueprint.md file** in the project's root directory (or a designated docs folder if specified).
-  * The blueprint.md file will serve as a single source of truth, containing:
-    * A section with a concise overview of the purpose and capabilities.
-    * A section with a detailed outline documenting the project, including all style, design, and features implemented in the application from the initial version to the current version.
-    * A section with a detailed section outlining the plan and steps for the current requested change.
-  * Before initiating any new change or at the start of a new chat session, the AI will reference the blueprint.md to ensure full context and understanding of the application's current state and existing features. This ensures consistency and avoids redundant or conflicting modifications.
-* **Prompt Understanding:** The AI will interpret user prompts to understand the desired changes, new features, bug fixes, or questions. It will ask clarifying questions if the prompt is ambiguous.
-* **Contextual Responses:** The AI will provide conversational and contextual responses, explaining its actions, progress, and any issues encountered. It will summarize changes made.
-* **Error Checking Flow:**
-  1. **Code Change:** AI applies a code modification.
-  2. **Lint/Format:** AI runs `eslint . --fix`.
-  3. **Dependency Check:** If `package.json` was modified, AI runs `npm install`.
-  4. **Compile & Analyze:** AI monitors the terminal for Vite and linter errors.
-  5. **Test Execution:** If tests were requested or modified, AI runs `npm test`.
-  6. **Preview Check:** AI observes the browser preview for visual and runtime errors.
-  7. **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
-
+*   **Generación de Planes y Gestión de Blueprints:** Cada vez que el usuario solicita un cambio, la IA primero generará una visión general clara del plan y una lista de pasos procesables. Este plan se utilizará luego para **crear o actualizar un archivo blueprint.md** en el directorio raíz del proyecto (o en una carpeta de documentos designada si se especifica).
+    *   El archivo blueprint.md servirá como una única fuente de verdad, que contiene:
+        *   Una sección con una visión general concisa del propósito y las capacidades.
+        *   Una sección con un esquema detallado que documenta el proyecto, incluyendo todo el estilo, diseño y características implementadas en la aplicación desde la versión inicial hasta la versión actual.
+        *   Una sección con una sección detallada que describe el plan y los pasos para el cambio solicitado actual.
+    *   Antes de iniciar cualquier cambio nuevo o al comienzo de una nueva sesión de chat, la IA hará referencia al blueprint.md para garantizar un contexto y una comprensión completos del estado actual y las características existentes de la aplicación. Esto asegura la consistencia y evita modificaciones redundantes o conflictivas.
+*   **Comprensión de Prompts:** La IA interpretará los prompts del usuario para entender los cambios deseados, nuevas características, correcciones de errores o preguntas. Hará preguntas aclaratorias si el prompt es ambiguo.
+*   **Respuestas Contextuales:** La IA proporcionará respuestas conversacionales y contextuales, explicando sus acciones, progreso y cualquier problema encontrado. Resumirá los cambios realizados.
+*   **Flujo de Verificación de Errores:**
+    1.  **Cambio de Código:** La IA aplica una modificación de código.
+    2.  **Lint/Formato:** La IA ejecuta `eslint . --fix`.
+    3.  **Verificación de Dependencias:** Si se modificó `package.json`, la IA ejecuta `npm install`.
+    4.  **Compilar y Analizar:** La IA monitorea el terminal en busca de errores de Vite y del linter.
+    5.  **Ejecución de Pruebas:** Si se solicitaron o modificaron pruebas, la IA ejecuta `npm test`.
+    6.  **Verificación de Vista Previa:** La IA observa la vista previa del navegador en busca de errores visuales y de tiempo de ejecución.
+    7.  **Corrección/Informe:** Si se encuentran errores, la IA intenta correcciones automáticas. Si no tiene éxito, informa los detalles al usuario.
 
 # Firebase MCP
 
-When requested for Firebase add the following the server configurations to .idx/mcp.json. Just add the following and don't add anything else.
+Cuando se solicite para Firebase, añade las siguientes configuraciones de servidor a `.idx/mcp.json`. Solo añade lo siguiente y no añadas nada más.
 
+```json
 {
     "mcpServers": {
         "firebase": {
@@ -259,3 +259,4 @@ When requested for Firebase add the following the server configurations to .idx/
         }
     }
 }
+```
