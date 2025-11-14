@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useOrders } from '../contexts/OrdersContext';
 import {
-  Container,
   Typography,
   Paper,
   Button,
@@ -13,24 +12,86 @@ import {
   CircularProgress,
   TextField,
   MenuItem,
+  useTheme,
+  Alert,
+  styled,
+  AlertTitle
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import QRCode from 'qrcode';
 import CreditCardForm from '../components/CreditCardForm';
+import PageLayout from '../components/PageLayout';
+import { CreditCard as CreditCardIcon } from '@mui/icons-material';
+
+const GlassmorphicPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    boxShadow: theme.shadows[8],
+    borderRadius: '16px',
+    color: 'white',
+    padding: theme.spacing(3, 4),
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+    '& label.Mui-focused': {
+        color: theme.palette.secondary.main,
+    },
+    '& .MuiInputLabel-root': {
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    '& .MuiOutlinedInput-root': {
+        color: 'white',
+        '& .MuiSelect-icon': {
+            color: 'rgba(255, 255, 255, 0.8)',
+        },
+        '& fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+        },
+        '&:hover fieldset': {
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.secondary.main,
+        },
+    },
+}));
+
+const GlassmorphicAlert = styled(Alert)(({ theme }) => ({
+    backgroundColor: 'rgba(0, 100, 255, 0.2)',
+    color: '#E0E0E0',
+    fontWeight: 'bold',
+    '& .MuiAlert-icon': {
+        color: theme.palette.info.light,
+    }
+}));
+
+const getChipStyle = (status) => {
+    const baseStyle = { color: 'white', fontWeight: 'bold' };
+    switch (status) {
+      case 'Pendiente':
+        return { ...baseStyle, backgroundColor: '#f44336' }; // Rojo
+      default:
+        return {};
+    }
+  };
 
 function Facturacion() {
   const location = useLocation();
   const navigate = useNavigate();
   const { updateOrderStatus } = useOrders();
   const qrCanvasRef = useRef(null);
-  
+  const theme = useTheme();
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState('card'); // Iniciar con tarjeta
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [isPaid, setIsPaid] = useState(false);
 
   useEffect(() => {
     let orderData = location.state?.order;
+
+    // If no order in state, try sessionStorage
     if (!orderData) {
       const savedOrder = sessionStorage.getItem('lastOrder');
       if (savedOrder) {
@@ -42,14 +103,20 @@ function Facturacion() {
         }
       }
     }
-    setOrder(orderData);
+
+    if (orderData) {
+      setOrder(orderData);
+      // Save to sessionStorage to persist across refreshes
+      sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+    }
+
     setLoading(false);
-  }, [location.state?.order]);
+  }, [location.state?.order]); // Rerun only if navigation state changes
 
   useEffect(() => {
     if (order && qrCanvasRef.current && paymentMethod === 'qr') {
       const qrText = `https://example.com/pay?orderId=${order.id}&total=${order.total}`;
-      QRCode.toCanvas(qrCanvasRef.current, qrText, { width: 220 }, (error) => {
+      QRCode.toCanvas(qrCanvasRef.current, qrText, { width: 200, margin: 2, color: { dark: '#FFFFFF', light: '#00000000' } }, (error) => {
         if (error) console.error('Error generating QR Code:', error);
       });
     }
@@ -57,70 +124,70 @@ function Facturacion() {
 
   const handlePaymentSuccess = () => {
     if (order) {
-      updateOrderStatus(order.id, 'En Preparación');
+      updateOrderStatus(order.id, 'Pendiente');
       setIsPaid(true);
+      sessionStorage.removeItem('lastOrder');
     }
   };
 
   if (loading) {
-    return <Container sx={{ py: 8, textAlign: 'center' }}><CircularProgress /></Container>;
+    return <PageLayout><Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}><CircularProgress size={60} color="secondary" /></Box></PageLayout>;
   }
 
   if (!order) {
     return (
-      <Container maxWidth="sm" sx={{ mt: 4, textAlign: 'center' }}>
-        <Typography variant="h5" gutterBottom>No se encontró información del pedido.</Typography>
-        <Button component={Link} to="/menu" variant="contained" color="primary">Volver al Menú</Button>
-      </Container>
+        <PageLayout title="Error">
+            <GlassmorphicPaper sx={{ textAlign: 'center', py: 6 }}>
+                <Typography variant="h4" gutterBottom>No se encontró el pedido</Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.7)', mb: 4 }}>Parece que no hay un pedido activo para facturar.</Typography>
+                <Button component={Link} to="/menu" variant="contained" color="primary" size="large">Volver al Menú</Button>
+            </GlassmorphicPaper>
+        </PageLayout>
     );
   }
 
   if (isPaid) {
     return (
-      <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <CheckCircleOutlineIcon color="success" sx={{ fontSize: 80, mb: 2 }} />
-          <Typography variant="h4" gutterBottom>¡Pago Confirmado!</Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-            Tu pedido está <Chip label="En Preparación" color="warning" />.
-          </Typography>
-          <Button onClick={() => navigate('/orders')} variant="contained" size="large">Ver Mis Pedidos</Button>
-        </Paper>
-      </Container>
+        <PageLayout title="¡Pago Confirmado!">
+            <GlassmorphicPaper sx={{ p: { xs: 3, sm: 5 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CheckCircleOutlineIcon color="success" sx={{ fontSize: { xs: 70, sm: 90 }, mb: 2, filter: 'drop-shadow(0 0 10px limegreen)' }} />
+                <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.8)', mb: 4 }}>
+                    Tu pedido está <Chip label="Pendiente" size="small" sx={getChipStyle('Pendiente')} />.
+                </Typography>
+                <Button onClick={() => navigate('/orden')} variant="contained" size="large">Ver Mis Pedidos</Button>
+            </GlassmorphicPaper>
+        </PageLayout>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h3" gutterBottom align="center" sx={{ fontWeight: 800, mb: 4 }}>
-        Finaliza tu Pago
-      </Typography>
-      <Grid container spacing={4}>
+    <PageLayout title="Finaliza tu Pago" icon={CreditCardIcon}>
+      <Grid container spacing={{ xs: 3, lg: 5 }}>
         <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 3, borderRadius: 3, position: 'sticky', top: 80 }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>Resumen</Typography>
-            <Chip label={`Pedido: ${order.orderType === 'table' ? `Mesa ${order.tableNumber}` : order.takeAwayNumber}`} color="primary" sx={{ mb: 2 }} />
-            <Divider sx={{ my: 2 }} />
-            <Box sx={{ maxHeight: 200, overflow: 'auto', mb: 2 }}>
+          <GlassmorphicPaper sx={{ position: { md: 'sticky' }, top: 90 }}>
+            <Typography variant='h4' gutterBottom sx={{ fontWeight: 'bold' }}>Resumen</Typography>
+            <Chip label={order.orderType === 'table' ? `Mesa ${order.tableNumber}` : `Para Llevar: ${order.takeAwayNumber}` } color="primary" sx={{ mb: 2, fontWeight: 500 }} />
+            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
+            <Box sx={{ maxHeight: 220, overflow: 'auto', pr: 1, mb: 2 }}>
               {order.items.map(item => (
-                <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography>{item.name} (x{item.quantity})</Typography>
-                  <Typography>${(item.price * item.quantity).toFixed(2)}</Typography>
+                <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Typography>{item.name} <span style={{ color: 'rgba(255,255,255,0.6)' }}>(x{item.quantity})</span></Typography>
+                  <Typography sx={{ fontWeight: 500 }}>${(item.price * item.quantity).toFixed(2)}</Typography>
                 </Box>
               ))}
             </Box>
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Total:</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>${order.total.toFixed(2)}</Typography>
+              <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Total:</Typography>
+              <Typography variant='h4' sx={{ fontWeight: 'bold' }} color="primary">${order.total.toFixed(2)}</Typography>
             </Box>
-          </Paper>
+          </GlassmorphicPaper>
         </Grid>
 
         <Grid item xs={12} md={7}>
-          <Paper sx={{ p: 4, borderRadius: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>Método de Pago</Typography>
-            <TextField
+          <GlassmorphicPaper>
+            <Typography variant='h4' sx={{ fontWeight: 700, mb: 3 }}>Método de Pago</Typography>
+            <StyledTextField
               select
               label="Selecciona una opción"
               value={paymentMethod}
@@ -132,46 +199,37 @@ function Facturacion() {
               <MenuItem value="card">Tarjeta de Crédito / Débito</MenuItem>
               <MenuItem value="qr">Código QR</MenuItem>
               <MenuItem value="transfer">Transferencia Bancaria</MenuItem>
-            </TextField>
+            </StyledTextField>
 
-            <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 2, minHeight: 320, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <Box sx={{ p: { xs: 2, sm: 3 }, border: `1px solid rgba(255,255,255,0.2)`, borderRadius: '12px', minHeight: 350, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               {paymentMethod === 'card' && (
                 <CreditCardForm onPaymentSuccess={handlePaymentSuccess} orderTotal={order.total} />
               )}
               {paymentMethod === 'qr' && (
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography>Escanea el código con tu app de pagos:</Typography>
-                  <canvas ref={qrCanvasRef} />
+                <Box sx={{ textAlign: 'center', py: 2 }}>
+                  <Typography sx={{color: 'rgba(255,255,255,0.9)'}}>Escanea el código con tu app de pagos preferida:</Typography>
+                  <canvas ref={qrCanvasRef} style={{ marginTop: 20, borderRadius: '8px', border: `1px solid ${theme.palette.divider}` }} />
+                  <Button variant="contained" color="success" fullWidth size="large" sx={{ mt: 3, py: 1.5, fontWeight: 'bold' }} onClick={handlePaymentSuccess}>Hecho, confirmar pago</Button>
                 </Box>
               )}
               {paymentMethod === 'transfer' && (
                 <Box>
                   <Typography variant="h6" gutterBottom>Datos para la transferencia:</Typography>
-                  <Typography><strong>Banco:</strong> Banco Digital Ficticio</Typography>
-                  <Typography><strong>Alias:</strong> hamburguesas.deliciosas</Typography>
-                  <Typography><strong>CBU:</strong> 0123456789012345678901</Typography>
-                  <Typography sx={{ mt: 2 }}>Recuerda incluir tu número de pedido en el concepto.</Typography>
+                  <GlassmorphicAlert severity="info" sx={{ mb: 2 }}>
+                    <AlertTitle>Datos Bancarios</AlertTitle>
+                    <Typography><strong>Banco:</strong> Banco Digital Ficticio</Typography>
+                    <Typography><strong>Alias:</strong> hamburguesas.deliciosas</Typography>
+                    <Typography><strong>CBU:</strong> 0123456789012345678901</Typography>
+                  </GlassmorphicAlert>
+                  <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.7)' }}>Recuerda incluir el número de pedido en el concepto de la transferencia.</Typography>
+                  <Button variant="contained" color="success" fullWidth size="large" sx={{ mt: 3, py: 1.5, fontWeight: 'bold' }} onClick={handlePaymentSuccess}>Ya realicé la transferencia</Button>
                 </Box>
               )}
-
-              {/* Botón de confirmación para QR y Transferencia */}
-              {(paymentMethod === 'qr' || paymentMethod === 'transfer') && (
-                <Button 
-                    variant="contained" 
-                    color="success" 
-                    fullWidth 
-                    size="large" 
-                    sx={{ mt: 3, py: 1.5, fontSize: '1.2rem' }}
-                    onClick={handlePaymentSuccess}
-                >
-                    {paymentMethod === 'qr' ? 'Confirmar Pago' : 'Ya realicé la transferencia'}
-                </Button>
-              )}
             </Box>
-          </Paper>
+          </GlassmorphicPaper>
         </Grid>
       </Grid>
-    </Container>
+    </PageLayout>
   );
 }
 

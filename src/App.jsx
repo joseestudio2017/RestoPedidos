@@ -1,101 +1,96 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import {
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
-  Box,
-} from '@mui/material';
+import React, { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { getToken } from 'firebase/messaging';
+import { messaging } from './firebase';
+import { RoleProvider } from './contexts/RoleContext';
+import { MenuProvider } from './contexts/MenuContext';
+import { CartProvider } from './contexts/CartContext';
+import { OrdersProvider } from './contexts/OrdersContext';
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+import theme from './theme';
 
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
-import Carrito from './pages/Carrito'; // Cambiado
-import Orders from './pages/Orders';
-import AdminAuth from './pages/AdminAuth';
-import Profile from './pages/Profile';
-import Clientes from './pages/Clientes';
-import Mozo from './pages/Mozo';
+import Carrito from './pages/Carrito';
+import Ingreso from './pages/Ingreso';
+import Orden from './pages/Orden';
+import OrdenHis from './pages/OrdenHis';
 import Facturacion from './pages/Facturacion';
-
-// NOTA: El OrdersProvider se gestiona en main.jsx, no aquí.
-
-// Paleta de colores moderna inspirada en McDonald's
-const modernTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#D7231D', // Rojo McDonald's
-    },
-    secondary: {
-      main: '#FFC72C', // Amarillo McDonald's
-    },
-    background: {
-      default: '#F5F5F5', // Un gris muy claro para el fondo
-      paper: '#FFFFFF',   // Blanco para los componentes de "papel"
-    },
-    text: {
-      primary: '#212121', // Negro/gris oscuro para el texto principal
-      secondary: '#757575', // Gris para el texto secundario
-    },
-  },
-  typography: {
-    fontFamily: ['Roboto', 'sans-serif'].join(','),
-    h1: { fontWeight: 700 },
-    h2: { fontWeight: 700 },
-    h3: { fontWeight: 600 },
-    h4: { fontWeight: 600 },
-    h5: { fontWeight: 600 },
-    button: {
-      textTransform: 'none', // Evita que los botones estén en mayúsculas
-      fontWeight: 'bold',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-5px)',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
-          },
-        },
-      },
-    },
-  },
-});
+import MenuABM from './pages/MenuABM';
+import Entrega from './pages/Entrega';
+import EntregaHis from './pages/EntregaHis';
+import AdminRoute from './components/AdminRoute';
+import './App.css';
 
 function App() {
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          const token = await getToken(messaging, { vapidKey: 'YOUR_VAPID_KEY' }); 
+          console.log('FCM Token:', token);
+        } else {
+          console.log('Unable to get permission to notify.');
+        }
+      } catch (error) {
+        console.error('An error occurred while requesting notification permission. ', error);
+      }
+    };
+
+    // requestNotificationPermission();
+  }, []);
+
   return (
-    <ThemeProvider theme={modernTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <Navbar />
-          <Box component="main" sx={{ flexGrow: 1 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/carrito" element={<Carrito />} /> {/* Cambiado */}
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/admin" element={<AdminAuth />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/clientes" element={<Clientes />} />
-              <Route path="/mozo" element={<Mozo />} />
-              <Route path="/facturacion" element={<Facturacion />} />
-            </Routes>
-          </Box>
-        </Box>
-      </Router>
+      <RoleProvider>
+        <MenuProvider>
+          <CartProvider>
+            <OrdersProvider>
+              <AppContent />
+            </OrdersProvider>
+          </CartProvider>
+        </MenuProvider>
+      </RoleProvider>
     </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          py: isHomePage ? 0 : { xs: 4, md: 6 }, 
+          px: isHomePage ? 0 : { xs: 2, sm: 3, md: 4 },
+          mt: isHomePage ? '' : '64px'
+        }}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/carrito" element={<Carrito />} />
+          <Route path="/ingreso" element={<Ingreso />} />
+          <Route path="/orden" element={<Orden />} />
+          <Route path="/historial" element={<OrdenHis />} />
+          <Route path="/facturacion" element={<Facturacion />} />
+          <Route path="/entrega" element={<Entrega />} />
+          <Route path="/menu-abm" element={<AdminRoute><MenuABM /></AdminRoute>} />
+          <Route path="/entrega-historial" element={<AdminRoute><EntregaHis /></AdminRoute>} />
+        </Routes>
+      </Box>
+      {!isHomePage && <Footer />}
+    </Box>
   );
 }
 
